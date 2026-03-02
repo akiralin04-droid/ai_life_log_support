@@ -1,2 +1,17 @@
-<h1>Homes#top</h1>
-<p>Find me in app/views/homes/top.html.erb</p>
+<div class="p-5 mb-4 bg-light rounded-3 text-center">
+  <div class="container-fluid py-5">
+    <h1 class="display-5 fw-bold">AI Life Log Support</h1>
+    <p class="col-md-8 fs-4 mx-auto">
+      日々の記録から、価値あるレビューを。<br>
+      AIがあなたの「日記」を分析し、共有できる「レビュー」を生成します。
+    </p>
+    <div class="mt-4">
+      <% unless current_user %>
+        <%= button_to "ゲストログイン（閲覧用）", "session/guest_login", class: "btn btn-warning btn-lg px-4 gap-3" %>
+        <div class="mt-3">
+          <%= link_to "新規登録して始める", new_registration_path, class: "btn btn-primary btn-lg px-4 gap-3" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

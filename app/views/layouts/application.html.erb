@@ -1,33 +1,60 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <!-- ブラウザのタブに表示されるタイトル -->
     <title>AI Life Log Support</title>
+    
+    <!-- スマホで見た時に文字が小さくならないようにする設定 -->
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    
+    <!-- Railsのセキュリティ対策（偽サイトからの攻撃を防ぐ） -->
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <%# --- Bootstrap CSS (デザインの骨組み) --- %>
+    <!-- BootstrapのCSS（デザインの素）を読み込む -->
+    <!-- これがないと、デザインが崩れて「すっぴん」になります -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
 
-    <%# --- Font Awesome (アイコン) --- %>
+    <!-- Font Awesome（アイコン）を読み込む -->
     <script src="https://kit.fontawesome.com/203ce1fd24.js" crossorigin="anonymous"></script>
 
+    <!-- アプリ独自のCSS（app/assets/stylesheetsの中身）を読み込む -->
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    
+    <!-- アプリ独自のJavaScriptを読み込む -->
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <%# ここに後でヘッダーを作ります %>
+  <!-- 画面に表示される中身の開始 -->
+  <!-- d-flex... は「フッターを常に一番下に固定する」ためのBootstrapのクラス -->
+  <body class="d-flex flex-column min-vh-100">
     
-    <div class="container">
-      <%# ここに後でフラッシュメッセージを表示します %>
-      
-      <%= yield %>
-    </div>
+    <!-- ヘッダーの部品（_header.html.erb）をここに埋め込む -->
+    <%= render 'layouts/header' %>
 
-    <%# ここに後でフッターを作ります %>
+    <!-- メインコンテンツエリア -->
+    <!-- flex-grow-1 は「余白があったらここを広げる」という設定 -->
+    <main class="flex-grow-1">
+      <div class="container mt-4">
+        <!-- 成功メッセージ（notice）があれば表示する -->
+        <% if notice %>
+          <div class="alert alert-success"><%= notice %></div>
+        <% end %>
+        
+        <!-- 失敗メッセージ（alert）があれば表示する -->
+        <% if alert %>
+          <div class="alert alert-danger"><%= alert %></div>
+        <% end %>
 
-    <%# --- Bootstrap JS (動くパーツ用) --- %>
+        <!-- ★超重要：ここに各ページ（topやindexなど）の中身が入る -->
+        <%= yield %>
+      </div>
+    </main>
+
+    <!-- フッターの部品（_footer.html.erb）をここに埋め込む -->
+    <%= render 'layouts/footer' %>
+
+    <!-- BootstrapのJavaScript（メニューを開閉する動きなど）を読み込む -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
   </body>
 </html>
