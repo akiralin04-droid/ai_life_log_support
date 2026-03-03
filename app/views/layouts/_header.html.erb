@@ -1,23 +1,20 @@
 <header>
-  <!-- ナビゲーションバーを作る箱（Bootstrapのデザイン） -->
+  <%# navbar-dark: 文字を白く / bg-dark: 背景を黒く %>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-      <!-- ロゴ（クリックするとトップページへ） -->
-      <%= link_to "AI Life Log", root_path, class: "navbar-brand" %>
+      <%# ロゴ %>
+      <%= link_to "AI Life Log", root_path, class: "navbar-brand fw-bold" %>
       
-      <!-- ハンバーガーメニュー（スマホで見た時に出る三本線ボタン） -->
+      <%# スマホ用メニューボタン %>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       
-      <!-- メニューの中身 -->
+      <%# メニュー項目 %>
       <div class="collapse navbar-collapse" id="navbarNav">
-        <!-- 右寄せにする設定 -->
         <ul class="navbar-nav ms-auto">
-
-          <!-- ★ここが重要！ログイン状態による分岐 -->
           <% if current_user %>
-            <%# --- ログインしている時 --- %>
+            <%# ログイン時 %>
             <li class="nav-item">
               <%= link_to "日記を書く", new_diary_path, class: "nav-link" %>
             </li>
@@ -28,11 +25,10 @@
               <%= link_to "マイページ", user_path(current_user), class: "nav-link" %>
             </li>
             <li class="nav-item">
-              <!-- ログアウトは「データを消す」操作なので method: :delete が必要 -->
-              <%= button_to "ログアウト", session_path, method: :delete, class: "nav-link btn btn-link text-decoration-none" %>
+              <%= button_to "ログアウト", session_path, method: :delete, class: "nav-link btn btn-link text-decoration-none text-white-50" %>
             </li>
           <% else %>
-            <%# --- ログインしていない時 --- %>
+            <%# 未ログイン時 %>
             <li class="nav-item">
               <%= link_to "About", about_path, class: "nav-link" %>
             </li>
