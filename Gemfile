@@ -71,3 +71,7 @@ group :test do
   gem 'rspec-rails'       # テストフレームワーク
   gem 'factory_bot_rails' # テストデータ作成
 end
+
+group :production do
+  gem 'mysql2'
+end
