@@ -40,6 +40,8 @@ Rails.application.routes.draw do
   # レビュー機能 (AI生成含む)
   resources :reviews do
     collection do
+      # ↓↓↓ これを追加（詳細入力画面）
+      get :select_type 
       post :generate # AIによる下書き生成
     end
     # コメント・いいね (非同期)
