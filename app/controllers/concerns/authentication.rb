@@ -17,6 +17,9 @@ module Authentication
     # コントローラーで allow_unauthenticated_access を書くと、門番(require_authentication)をスキップできる
     def allow_unauthenticated_access(**options)
       skip_before_action :require_authentication, **options
+
+      #強制はしないけど、チケットを持ってるならログイン状態にしてあげるよ、という命令
+      before_action :resume_session, **options
     end
   end
 
