@@ -1,2 +1,47 @@
-<h1>Diaries#show</h1>
-<p>Find me in app/views/diaries/show.html.erb</p>
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    
+    <%# 日付と戻るリンク %>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <%# 日付を見やすく表示（例：2026/03/03 12:00） %>
+      <h5 class="text-muted"><%= @diary.created_at.strftime('%Y/%m/%d %H:%M') %> の記録</h5>
+      <%= link_to "一覧へ戻る", diaries_path, class: "btn btn-outline-secondary btn-sm" %>
+    </div>
+
+    <%# 日記の内容カード %>
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header bg-white fw-bold">
+        あなたの日記
+        <%# 公開/非公開バッジ %>
+        <% if @diary.is_published? %>
+          <span class="badge bg-success ms-2">公開中</span>
+        <% else %>
+          <span class="badge bg-secondary ms-2">非公開</span>
+        <% end %>
+      </div>
+      <div class="card-body" style="white-space: pre-wrap;"><%# 改行をそのまま表示する設定 %>
+        <%= @diary.content %>
+      </div>
+    </div>
+
+    <%# ★AIからの返信・要約エリア（今は空っぽですが、場所だけ作っておきます） %>
+    <div class="card mb-4 border-info shadow-sm">
+      <div class="card-header bg-info text-white fw-bold">
+        <i class="fas fa-robot"></i> AIからのフィードバック
+      </div>
+      <div class="card-body bg-light">
+        <% if @diary.ai_response.present? %>
+          <%= @diary.ai_response %>
+        <% else %>
+          <p class="text-muted mb-0">（AI分析の準備中です...）</p>
+        <% end %>
+      </div>
+    </div>
+
+    <%# 操作ボタン %>
+    <div class="d-flex justify-content-end gap-2">
+      <%= button_to "削除する", diary_path(@diary), method: :delete, data: { turbo_confirm: "本当に削除しますか？" }, class: "btn btn-danger btn-sm" %>
+    </div>
+
+  </div>
+</div>

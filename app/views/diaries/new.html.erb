@@ -1,2 +1,52 @@
-<h1>Diaries#new</h1>
-<p>Find me in app/views/diaries/new.html.erb</p>
+<%# 画面の中央に配置 %>
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    
+    <%# タイトル %>
+    <h2 class="text-center mb-4">今日の日記を書く</h2>
+    <p class="text-center text-muted">AIがあなたの記録をサポートします。<br>今日あったこと、感じたことを自由に書いてください。</p>
+
+    <%# エラーメッセージ表示エリア %>
+    <% if @diary.errors.any? %>
+      <div class="alert alert-danger">
+        <ul class="mb-0">
+          <% @diary.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%# 入力フォーム %>
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <%= form_with model: @diary, local: true do |f| %>
+          
+          <%# 日記本文の入力欄 %>
+          <div class="mb-3">
+            <%= f.label :content, "今の気持ちや出来事", class: "form-label fw-bold" %>
+            <%# チャットボックスっぽく高さを確保 %>
+            <%= f.text_area :content, rows: 10, class: "form-control", placeholder: "例：今日は新しいカフェに行ってみた。コーヒーが美味しくて、読書が捗った..." %>
+          </div>
+
+          <%# 公開設定（トグルスイッチ風） %>
+          <div class="mb-4 form-check form-switch">
+            <%= f.check_box :is_published, class: "form-check-input", id: "publishSwitch" %>
+            <%= f.label :is_published, "この日記を公開する（他の人に見せる）", class: "form-check-label", for: "publishSwitch" %>
+          </div>
+
+          <%# 送信ボタン %>
+          <div class="d-grid">
+            <%= f.submit "AIに記録する", class: "btn btn-primary btn-lg" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# 戻るリンク %>
+    <div class="mt-3 text-center">
+      <%= link_to "マイページへ戻る", user_path(current_user) %>
+    </div>
+
+  </div>
+</div>
