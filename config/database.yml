@@ -23,19 +23,16 @@ test:
 
 # Store production database in the storage/ directory, which by default
 # is mounted as a persistent Docker volume in config/deploy.yml.
+# 本番環境（AWS）の設定
 production:
+  # primary（メイン）の設定をMySQL用に書き換える
   primary:
     <<: *default
-    database: storage/production.sqlite3
-  cache:
-    <<: *default
-    database: storage/production_cache.sqlite3
-    migrations_paths: db/cache_migrate
-  queue:
-    <<: *default
-    database: storage/production_queue.sqlite3
-    migrations_paths: db/queue_migrate
-  cable:
-    <<: *default
-    database: storage/production_cable.sqlite3
-    migrations_paths: db/cable_migrate
+    adapter: mysql2
+    encoding: utf8mb4
+    charset: utf8mb4
+    collation: utf8mb4_general_ci
+    database: <%= ENV['DB_DATABASE'] %>
+    username: <%= ENV['DB_USERNAME'] %>
+    password: <%= ENV['DB_PASSWORD'] %>
+    host: <%= ENV['DB_HOST'] %>
