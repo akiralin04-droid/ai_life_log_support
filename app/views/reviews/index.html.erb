@@ -1,2 +1,38 @@
-<h1>Reviews#index</h1>
-<p>Find me in app/views/reviews/index.html.erb</p>
+<div class="row">
+  <div class="col-12 mb-4">
+    <h2 class="fw-bold">みんなのレビュー</h2>
+    <p class="text-muted">AIと共に生まれた、新しい発見。</p>
+  </div>
+</div>
+
+<div class="row">
+  <% @reviews.each do |review| %>
+    <div class="col-md-6 mb-4">
+      <div class="card h-100 shadow-sm hover-shadow">
+        <div class="card-body">
+          <div class="d-flex justify-content-between mb-2">
+            <span class="badge bg-secondary">カテゴリ: <%= review.category %></span>
+            <span class="text-warning"><%= "★" * (review.rating || 0) %></span>
+          </div>
+          
+          <h5 class="card-title fw-bold">
+            <%= link_to review.title, review_path(review), class: "text-decoration-none text-dark stretched-link" %>
+          </h5>
+          
+          <%# 本文の最初の50文字だけ表示 %>
+          <p class="card-text text-muted">
+            <%= truncate(review.body, length: 50) %>
+          </p>
+        </div>
+        <div class="card-footer bg-white border-top-0 d-flex justify-content-between align-items-center">
+          <small class="text-muted">
+            <i class="fas fa-user"></i> <%= review.user.name %>
+          </small>
+          <small class="text-muted">
+            <%= time_ago_in_words(review.created_at) %>前
+          </small>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,33 @@
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h2 class="text-center mb-4">詳細情報を追加</h2>
+    
+    <div class="card mb-4">
+      <div class="card-header bg-light">
+        元になる日記
+      </div>
+      <div class="card-body">
+        <%= @diary.content %>
+      </div>
+    </div>
+
+    <div class="alert alert-info">
+      <i class="fas fa-microphone"></i> <strong>音声入力のヒント</strong><br>
+      商品名や、具体的な感想（味、俳優の演技、使い心地など）を詳しく話しかけてください。<br>
+      AIが日記の感情と組み合わせて、レビューを完成させます。
+    </div>
+
+    <%= form_with url: generate_reviews_path, method: :post, local: true do |f| %>
+      <%= f.hidden_field :diary_id, value: @diary.id %>
+
+      <div class="mb-3">
+        <%= f.label :detail, "商品の詳細・具体的な感想", class: "form-label fw-bold" %>
+        <%= f.text_area :detail, rows: 6, class: "form-control", placeholder: "（例）〇〇という映画を見た。映画のアクションシーンが凄かった。特に主人公がビルから飛び降りるシーンは圧巻で..." %>
+      </div>
+
+      <div class="d-grid">
+        <%= f.submit "AIレビューを生成する", class: "btn btn-success btn-lg" %>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -40,7 +40,13 @@
 
     <%# 操作ボタン %>
     <div class="d-flex justify-content-end gap-2">
-      <%= button_to "削除する", diary_path(@diary), method: :delete, data: { turbo_confirm: "本当に削除しますか？" }, class: "btn btn-danger btn-sm" %>
+      <%# ★★★ 追加：レビュー生成ボタン ★★★ %>
+      <%# select_type_reviews_path に diary_id を持たせて移動します %>
+      <%= link_to select_type_reviews_path(diary_id: @diary.id), class: "btn btn-success" do %>
+        <i class="fas fa-magic"></i> この日記からレビューを作る
+      <% end %>
+
+      <%= button_to "削除する", diary_path(@diary), method: :delete, data: { turbo_confirm: "本当に削除しますか？" }, class: "btn btn-danger" %>
     </div>
 
   </div>
