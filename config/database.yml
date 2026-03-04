@@ -49,3 +49,16 @@ production:
     password: <%= ENV['DB_PASSWORD'] %>
     host: <%= ENV['DB_HOST'] %>
     migrations_paths: db/cable_migrate
+
+# 【ここを追加！】Solid Queue用の設定
+  queue:
+    <<: *default
+    adapter: mysql2
+    encoding: utf8mb4
+    charset: utf8mb4
+    collation: utf8mb4_general_ci
+    database: <%= ENV['DB_DATABASE'] %>
+    username: <%= ENV['DB_USERNAME'] %>
+    password: <%= ENV['DB_PASSWORD'] %>
+    host: <%= ENV['DB_HOST'] %>
+    migrations_paths: db/queue_migrate
