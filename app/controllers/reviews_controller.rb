@@ -80,6 +80,10 @@ class ReviewsController < ApplicationController
 
   # ストロングパラメータ
   def review_params
-    params.require(:review).permit(:title, :body, :rating, :category, :is_published, :diary_id)
+    # categoryを数値(integer)に変換して受け取るように修正
+    params.require(:review).permit(:diary_id, :title, :body, :rating, :category, :is_published).tap do |whitelisted|
+      whitelisted[:category] = whitelisted[:category].to_i if whitelisted[:category].present?
+    end
   end
+
 end
