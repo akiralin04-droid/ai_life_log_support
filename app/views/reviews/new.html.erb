@@ -48,9 +48,9 @@
             </div>
             <div class="col-md-6">
               <%= f.label :category, "カテゴリ", class: "form-label fw-bold" %>
-              <%# まだカテゴリ設定をしていないので、とりあえず数値入力かテキストにしておきます %>
-              <%# 後でEnumを設定したらセレクトボックスに変えます %>
-              <%= f.number_field :category, class: "form-control", placeholder: "0:本, 1:映画..." %>
+              <%# モデルのenum定義を使って、プルダウンメニューを表示 %>
+              <%# Reviewモデルで作った日本語リスト(category_options)を使います %>
+              <%= f.select :category, Review.category_options, {}, class: "form-select" %>
             </div>
           </div>
 

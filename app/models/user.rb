@@ -7,6 +7,7 @@ class User < ApplicationRecord
   has_many :campaigns, dependent: :destroy # 管理者として作成したもの
   has_many :comments, dependent: :destroy
   has_many :favorites, dependent: :destroy
+  has_many :favorite_reviews, through: :favorites, source: :review
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
   

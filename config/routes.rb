@@ -34,6 +34,9 @@ Rails.application.routes.draw do
   # ユーザー機能
   resources :users, only: [:index, :show, :edit, :update]
 
+  # マイページ (showのみ)
+  resource :mypage, only: [:show]
+
   # 日記機能
   resources :diaries
 

@@ -1,53 +1,95 @@
-<div class="row justify-content-center">
-  <div class="col-md-8">
-    
-    <%# 日付と戻るリンク %>
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <%# 日付を見やすく表示（例：2026/03/03 12:00） %>
-      <h5 class="text-muted"><%= @diary.created_at.strftime('%Y/%m/%d %H:%M') %> の記録</h5>
-      <%= link_to "一覧へ戻る", diaries_path, class: "btn btn-outline-secondary btn-sm" %>
-    </div>
+<%# コンテナで全体を囲み、上下に余白(py-5)を設定 %>
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
 
-    <%# 日記の内容カード %>
-    <div class="card mb-4 shadow-sm">
-      <div class="card-header bg-white fw-bold">
-        あなたの日記
-        <%# 公開/非公開バッジ %>
-        <% if @diary.is_published? %>
-          <span class="badge bg-success ms-2">公開中</span>
-        <% else %>
-          <span class="badge bg-secondary ms-2">非公開</span>
-        <% end %>
+      <%# --- 日記の内容を表示するカード --- %>
+      <div class="card shadow-sm mb-4">
+        
+        <%# カードのヘッダー：日付と公開ステータスを表示 %>
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+          <%# 日付 %>
+          <span class="fw-bold text-muted">
+            <i class="far fa-calendar-alt me-2"></i>
+            <%= @diary.created_at.strftime('%Y年%m月%d日 %H:%M') %>
+          </span>
+          
+          <%# 公開ステータスのバッジ表示 %>
+          <% if @diary.is_published %>
+            <span class="badge bg-success">公開中</span>
+          <% else %>
+            <span class="badge bg-secondary">非公開</span>
+          <% end %>
+        </div>
+
+        <%# カードのボディ：日記の本文を表示 %>
+        <div class="card-body p-4">
+          <%# simple_format だと改行が多くなりすぎることがあるため、styleで調整 %>
+          <%# white-space: pre-wrap は改行コードをそのまま改行として表示するCSSです %>
+          <div class="card-text" style="white-space: pre-wrap; line-height: 1.8; color: #4b5563;">
+            <%= @diary.content %>
+          </div>
+        </div>
+
+        <%# カードのフッター：操作ボタン %>
+        <div class="card-footer bg-white py-3">
+          <div class="d-flex justify-content-end gap-2">
+            <%# 削除ボタン：turbo_method: :delete でDELETEリクエストを送信 %>
+            <%# turbo_confirm で削除前の確認ダイアログを表示 %>
+            <%= link_to "削除する", diary_path(@diary), data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？" }, class: "btn btn-outline-danger btn-sm" %>
+            
+            <%# マイページへ戻るボタン %>
+            <%= link_to "マイページへ", mypage_path, class: "btn btn-outline-secondary btn-sm" %>
+          </div>
+        </div>
       </div>
-      <div class="card-body" style="white-space: pre-wrap;"><%# 改行をそのまま表示する設定 %>
-        <%= @diary.content %>
+
+      <%# --- AI分析レポートエリア --- %>
+      <div class="card border-info border-opacity-25 bg-info bg-opacity-10">
+        <div class="card-body text-center py-4">
+          <h5 class="text-info fw-bold mb-3"><i class="fas fa-robot"></i> AI分析レポート</h5>
+          
+          <%# AIによる分析が存在するか %>
+          <% if @diary.ai_response.present? %>
+            
+            <%# AIコメント表示 %>
+            <div class="text-start d-inline-block text-dark mb-3" style="max-width: 100%;">
+              <i class="fas fa-quote-left text-info opacity-50 fa-2x float-start me-2"></i>
+              <div style="font-size: 1.05rem; line-height: 1.8;">
+                <%= simple_format(@diary.ai_response) %>
+              </div>
+            </div>
+
+            <%# ▼▼▼ 追加機能: レビュー作成への導線 ▼▼▼ %>
+            <div class="mt-4 pt-3 border-top border-info border-opacity-25">
+              <% if @diary.review %>
+                <%# 既にレビューがある場合 %>
+                <p class="text-muted mb-2">この日記はすでにレビュー済みです。</p>
+                <%# レビュー詳細へのリンク（まだ画面がない場合はエラーになる可能性があります） %>
+                <%= link_to "レビューを見る", review_path(@diary.review), class: "btn btn-outline-info btn-sm" %>
+              
+              <% else %>
+                <%# レビューがまだない場合 %>
+                <p class="fw-bold text-dark mb-2">この分析を踏まえて、レビューを作成しますか？</p>
+                <p class="small text-muted mb-3">レビューとして保存すると、みんなのレビュー一覧やマイページで振り返ることができます。</p>
+                
+                <%# diary_id をパラメータとして渡して、レビュー作成画面へ遷移 %>
+                <%= link_to select_type_reviews_path(diary_id: @diary.id), class: "btn btn-success fw-bold text-white px-4 shadow-sm" do %>
+                  <i class="fas fa-magic me-1"></i> AIでレビューを作成する
+                <% end %>
+              <% end %>
+            </div>
+            <%# ▲▲▲ 追加ここまで ▲▲▲ %>
+
+          <% else %>
+            <%# まだ分析されていない場合 %>
+            <div class="py-3">
+              <div class="spinner-border text-info mb-2" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <p class="text-muted mb-0">AIが分析中です...<br><small>（リロードすると表示される場合があります）</small></p>
+            </div>
+          <% end %>
+
+        </div>
       </div>
-    </div>
-
-    <%# ★AIからの返信・要約エリア（今は空っぽですが、場所だけ作っておきます） %>
-    <div class="card mb-4 border-info shadow-sm">
-      <div class="card-header bg-info text-white fw-bold">
-        <i class="fas fa-robot"></i> AIからのフィードバック
-      </div>
-      <div class="card-body bg-light">
-        <% if @diary.ai_response.present? %>
-          <%= @diary.ai_response %>
-        <% else %>
-          <p class="text-muted mb-0">（AI分析の準備中です...）</p>
-        <% end %>
-      </div>
-    </div>
-
-    <%# 操作ボタン %>
-    <div class="d-flex justify-content-end gap-2">
-      <%# ★★★ 追加：レビュー生成ボタン ★★★ %>
-      <%# select_type_reviews_path に diary_id を持たせて移動します %>
-      <%= link_to select_type_reviews_path(diary_id: @diary.id), class: "btn btn-success" do %>
-        <i class="fas fa-magic"></i> この日記からレビューを作る
-      <% end %>
-
-      <%= button_to "削除する", diary_path(@diary), method: :delete, data: { turbo_confirm: "本当に削除しますか？" }, class: "btn btn-danger" %>
-    </div>
-
-  </div>
-</div>
