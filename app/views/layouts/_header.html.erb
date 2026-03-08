@@ -14,9 +14,22 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <% if current_user %>
-            <%# ログイン時 %>
+            <%# ========================================== %>
+            <%# 管理者の場合のみ表示する特別メニュー %>
+            <%# ========================================== %>
+            <% if current_user.admin? %>
+              <li class="nav-item me-3">
+                <%# 💡 admin_path は /admin (ダッシュボード) へのリンクです %>
+                <%= link_to "👑 管理画面", admin_path, class: "nav-link text-warning fw-bold" %>
+              </li>
+            <% end %>
+
+            <%# ========================================== %>
+            <%# 通常のログイン時メニュー %>
+            <%# ========================================== %>
             <li class="nav-item">
               <%= link_to "About", about_path, class: "nav-link" %>
+            </li> <%# 💡 ここにあった閉じ忘れを修正しました %>
             <li class="nav-item">
               <%= link_to "日記を書く", new_diary_path, class: "nav-link" %>
             </li>
@@ -33,7 +46,9 @@
               <%= button_to "ログアウト", session_path, method: :delete, class: "nav-link btn btn-link text-decoration-none text-white-50" %>
             </li>
           <% else %>
-            <%# 未ログイン時 %>
+            <%# ========================================== %>
+            <%# 未ログイン時メニュー %>
+            <%# ========================================== %>
             <li class="nav-item">
               <%= link_to "About", about_path, class: "nav-link" %>
             </li>
