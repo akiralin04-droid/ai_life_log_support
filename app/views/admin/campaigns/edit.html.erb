@@ -1,2 +1,13 @@
-<h1>Admin::Campaigns#edit</h1>
-<p>Find me in app/views/admin/campaigns/edit.html.erb</p>
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <h2 class="mb-4 fw-bold">キャンペーン編集</h2>
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+          <%# 編集画面でも同じフォームを使う %>
+          <%= render "form", campaign: @campaign %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
