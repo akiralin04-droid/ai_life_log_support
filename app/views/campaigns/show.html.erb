@@ -1,2 +1,58 @@
-<h1>Campaigns#show</h1>
-<p>Find me in app/views/campaigns/show.html.erb</p>
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      
+      <%# パンくずリスト（戻るリンク） %>
+      <div class="mb-4">
+        <%= link_to root_path, class: "text-decoration-none text-muted" do %>
+          <i class="fas fa-arrow-left me-1"></i> ダッシュボードへ戻る
+        <% end %>
+      </div>
+
+      <%# キャンペーン詳細カード %>
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-warning bg-gradient text-dark py-3">
+          <h5 class="mb-0 fw-bold"><i class="fas fa-bullhorn me-2"></i> キャンペーン情報</h5>
+        </div>
+        
+        <div class="card-body p-4 p-md-5">
+          <div class="text-center mb-5">
+            <span class="badge bg-primary mb-2 px-3 py-2 rounded-pill">
+              <%= @campaign.company_name %>
+            </span>
+            <h2 class="fw-bold mb-3"><%= @campaign.title %></h2>
+            <p class="text-muted mb-0">
+              <i class="far fa-clock me-1"></i> 終了日時: 
+              <%= @campaign.end_date ? @campaign.end_date.strftime("%Y年%m月%d日 %H:%M") : "未設定" %>
+            </p>
+          </div>
+
+          <div class="mb-5">
+            <h5 class="fw-bold border-bottom pb-2 mb-3">キャンペーン概要</h5>
+            <div class="fs-5" style="line-height: 1.8;">
+              <%= simple_format(@campaign.description) %>
+            </div>
+          </div>
+
+          <%# AIによるサポートの案内（アプリの独自性をアピール！） %>
+          <div class="alert alert-info shadow-sm mb-5">
+            <h6 class="alert-heading fw-bold"><i class="fas fa-robot me-2"></i> AIがレビュー作成をサポートします！</h6>
+            <p class="mb-0 small">
+              このキャンペーンでは、企業が知りたいポイント（味や使い心地など）をAIが自動で整理し、魅力的なレビュー記事に仕上げるお手伝いをします。まずは感想を簡単に入力してみましょう！
+            </p>
+          </div>
+
+          <%# 参加ボタン（レビュー作成画面へ） %>
+          <div class="d-grid gap-2 col-md-8 mx-auto">
+            <%# URLの末尾に ?campaign_id=〇〇 を付けて、AIレビュー生成画面に遷移させます %>
+            <%= link_to select_type_reviews_path(campaign_id: @campaign.id), class: "btn btn-success btn-lg shadow-sm rounded-pill" do %>
+              <i class="fas fa-pen-fancy me-2"></i> このキャンペーンに参加してレビューを書く
+            <% end %>
+          </div>
+          
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

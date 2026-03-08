@@ -42,16 +42,40 @@
       </div>
     </div>
 
-    <%# お知らせ・キャンペーン情報エリア %>
+    <%# お知らせ・キャンペーン情報エリア（動的化） %>
     <div class="p-4 mb-4 bg-white rounded-3 shadow-sm border">
-      <h4 class="fw-bold fs-5 border-bottom pb-2 mb-3">📢 お知らせ・キャンペーン</h4>
-      <ul class="mb-0 text-muted">
-        <li class="mb-2"><strong>【機能追加】</strong> 日記のAI分析機能がアップデートされました。</li>
-        <li class="mb-2"><strong>【キャンペーン】</strong> 今月レビューを3件以上書くと、特別なAI分析テーマが解放されます！（準備中）</li>
-        <li>不具合等ございましたら、お問い合わせフォームよりご連絡ください。</li>
-      </ul>
+      <h4 class="fw-bold fs-5 border-bottom pb-2 mb-3">📢 開催中のキャンペーン</h4>
+      
+      <%# キャンペーンが1件以上ある場合 %>
+      <% if @active_campaigns.any? %>
+        <div class="list-group list-group-flush mb-0">
+          <%# 取得したキャンペーンを1つずつ取り出して表示する（ループ） %>
+          <% @active_campaigns.each do |campaign| %>
+            <%# クリックすると、一般ユーザー向けのキャンペーン詳細画面に飛ぶリンク %>
+            <%= link_to campaign_path(campaign), class: "list-group-item list-group-item-action py-3" do %>
+              <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                <h6 class="mb-0 fw-bold text-primary">
+                  <span class="badge bg-warning text-dark me-2">キャンペーン</span>
+                  <%= campaign.title %>
+                </h6>
+                <small class="text-muted">
+                  <% if campaign.end_date %>
+                    <%= campaign.end_date.strftime("%m/%d %H:%M") %> まで
+                  <% end %>
+                </small>
+              </div>
+              <p class="mb-1 text-muted small"><i class="fas fa-building me-1"></i> <%= campaign.company_name %></p>
+              <p class="mb-0 text-muted small text-truncate"><%= campaign.description %></p>
+            <% end %>
+          <% end %>
+        </div>
+      <% else %>
+        <%# キャンペーンが1件もない場合の表示 %>
+        <p class="text-muted mb-0 py-2">現在開催中のキャンペーンはありません。</p>
+      <% end %>
     </div>
   </div>
+  
 
 <% else %>
   <%# ========================================== %>

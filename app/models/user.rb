@@ -13,4 +13,7 @@ class User < ApplicationRecord
   
   # 画像設定
   has_one_attached :profile_image
+
+  # （0: 一般ユーザー、1: 管理者）
+  enum :role, { general: 0, admin: 1 }
 end

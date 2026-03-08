@@ -1,0 +1,53 @@
+<%# app/views/admin/campaigns/_form.html.erb %>
+<%= form_with model: [:admin, campaign], local: true do |f| %>
+  <%# エラーメッセージ表示エリア %>
+  <% if campaign.errors.any? %>
+    <div class="alert alert-danger">
+      <ul class="mb-0">
+        <% campaign.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= f.label :company_name, "企業名", class: "form-label fw-bold" %>
+    <%= f.text_field :company_name, class: "form-control", placeholder: "株式会社〇〇" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :title, "キャンペーンタイトル", class: "form-label fw-bold" %>
+    <%= f.text_field :title, class: "form-control", placeholder: "新商品〇〇レビューキャンペーン" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :description, "キャンペーン概要", class: "form-label fw-bold" %>
+    <%= f.text_area :description, rows: 4, class: "form-control", placeholder: "キャンペーンの詳細や参加条件を記載してください" %>
+  </div>
+
+  <%# 💡 ここがアプリの独自ポイント！ AIへの指示 %>
+  <div class="mb-3">
+    <%= f.label :ai_prompt, "AIへの指示（プロンプト）", class: "form-label fw-bold" %>
+    <div class="form-text text-muted mb-2">※AIがユーザーにインタビューする際や、レビューを生成する際に意識させたい「企業が知りたいポイント」を記載します。</div>
+    <%= f.text_area :ai_prompt, rows: 4, class: "form-control", placeholder: "（例）商品の「味」と「パッケージの感想」を重点的に聞き出し、レビューに含めてください。" %>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <%= f.label :end_date, "終了日時", class: "form-label fw-bold" %>
+      <%= f.datetime_field :end_date, class: "form-control" %>
+    </div>
+    <div class="col-md-6 d-flex align-items-end pb-2">
+      <div class="form-check form-switch fs-5">
+        <%= f.check_box :is_active, class: "form-check-input", role: "switch" %>
+        <%= f.label :is_active, "公開する", class: "form-check-label" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-grid gap-2 d-md-block">
+    <%= f.submit "保存する", class: "btn btn-primary btn-lg px-5" %>
+    <%= link_to "キャンセル", admin_campaigns_path, class: "btn btn-outline-secondary btn-lg" %>
+  </div>
+<% end %>
