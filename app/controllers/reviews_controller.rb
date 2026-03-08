@@ -3,8 +3,12 @@ class ReviewsController < ApplicationController
 
   # 1. 一覧画面
   def index
-    # 新しい順に表示
-    @reviews = Review.where(is_published: true).order(created_at: :desc)
+    # Ransackで検索オブジェクト(@q)を作成
+    # params[:q] に検索条件が入ってきます
+    @q = Review.where(is_published: true).ransack(params[:q])
+    
+    # 検索結果を取得（デフォルトは作成日時の降順）
+    @reviews = @q.result(distinct: true).order(created_at: :desc)
   end
 
   # 2. 詳細画面

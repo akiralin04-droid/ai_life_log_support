@@ -5,6 +5,35 @@
   </div>
 </div>
 
+<%# --- 検索フォーム --- %>
+  <div class="card shadow-sm mb-5 border-0 bg-light">
+    <div class="card-body p-4">
+      <%= search_form_for @q, url: reviews_path, class: "row g-3 align-items-end" do |f| %>
+        
+        <%# キーワード検索（タイトル または 本文） %>
+        <div class="col-md-5">
+          <%= f.label :title_or_body_cont, "キーワード", class: "form-label fw-bold text-muted small" %>
+          <%= f.search_field :title_or_body_cont, class: "form-control", placeholder: "タイトルや本文で検索..." %>
+        </div>
+
+        <%# カテゴリ検索（以前作った日本語リストを使用） %>
+        <div class="col-md-4">
+          <%= f.label :category_eq, "カテゴリ", class: "form-label fw-bold text-muted small" %>
+          <%# モデルの定義を使って、'movie' を '2' に変換して送るようにします %>
+          <%= f.select :category_eq, Review.category_options.map { |name, key| [name, Review.categories[key]] }, { include_blank: "すべてのカテゴリ" }, class: "form-select" %>
+        </div>
+
+        <%# 検索ボタン %>
+        <div class="col-md-3">
+          <%= f.button type: :submit, class: "btn btn-primary w-100 fw-bold" do %>
+            <i class="fas fa-search me-1"></i> 検索する
+          <% end %>
+        </div>
+        
+      <% end %>
+    </div>
+  </div>
+
 <div class="row">
   <% @reviews.each do |review| %>
     <div class="col-md-6 mb-4">

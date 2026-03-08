@@ -29,4 +29,17 @@ class Review < ApplicationRecord
   validates :body, presence: true
   validates :rating, presence: true, inclusion: { in: 1..5 }
   validates :category, presence: true
+
+  # ▼▼▼ 追加：検索を許可するカラムの設定（Ransack用） ▼▼▼
+  def self.ransackable_attributes(auth_object = nil)
+    # 検索に使いたいカラム名を文字列の配列で返します
+    ["title", "body", "category", "rating", "created_at"]
+  end
+
+   # ▼▼▼ 今回追加する部分：関連テーブルの検索許可 ▼▼▼
+  def self.ransackable_associations(auth_object = nil)
+    # 今回は関連テーブル（Userの中身など）は検索しないので、空の配列を返します
+    []
+  end
+  
 end
