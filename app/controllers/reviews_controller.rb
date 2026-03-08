@@ -57,24 +57,37 @@ class ReviewsController < ApplicationController
 
   # [Step 1] 商品名と詳細を入力する画面
   def select_type
-    # URLから日記IDを受け取って、元の日記を特定する
-    @diary = current_user.diaries.find(params[:diary_id])
+    if params[:diary_id].present?
+      # 日記から遷移してきた場合：元の日記を特定する
+      @diary = current_user.diaries.find(params[:diary_id])
+    else
+      # ダッシュボード等から直接来た場合：日記は使わない
+      @diary = nil
+    end
   end
 
   # [Step 2] AI生成を実行して、投稿画面(new)へデータを渡す
   def generate
-    diary = current_user.diaries.find(params[:diary_id])
     additional_info = params[:detail] # フォームから送られてきた詳細情報
+    diary_content = ""
+    diary_id = nil
+
+    # 日記が選ばれている場合のみ、日記の情報を取得する
+    if params[:diary_id].present?
+      diary = current_user.diaries.find(params[:diary_id])
+      diary_content = diary.content
+      diary_id = diary.id
+    end
     
-    # 専門家(Service)に「日記」と「詳細」を渡して、レビューを作ってもらう
-    # ※Serviceが未作成の場合はエラーになるので注意
-    ai_result = AiReviewGenerationService.new(diary.content, additional_info).call
+    # 専門家(Service)に情報を渡して、レビューを作ってもらう
+    # 日記がない場合は diary_content は空文字になりますが、additional_info でAIが文章を作ります
+    ai_result = AiReviewGenerationService.new(diary_content, additional_info).call
     
     # 生成結果を使って、新しいレビューの箱を作る
     @review = Review.new
     @review.title = ai_result["title"]
     @review.body = ai_result["body"]
-    @review.diary_id = diary.id
+    @review.diary_id = diary_id
     
     # AIが作った内容が入った状態で、新規投稿画面(new)を表示する
     render :new, status: :unprocessable_entity
