@@ -61,6 +61,13 @@
               <%= link_to "マイページに戻る", mypage_path, class: "btn btn-outline-secondary" %>
             </div>
 
+            <%# ▼▼▼ 追加: 退会エリア ▼▼▼ %>
+            <hr>
+            <div class="text-center">
+              <p class="text-muted small">アカウントを削除しますか？</p>
+              <%= button_to "退会する", user_path(@user), method: :delete, data: { turbo_confirm: "本当に退会しますか？\n保存されたデータは全て削除されます。" }, class: "btn btn-link text-danger text-decoration-none btn-sm" %>
+            </div>
+            
           <% end %>
         </div>
       </div>

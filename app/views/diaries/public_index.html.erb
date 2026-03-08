@@ -1,0 +1,67 @@
+<div class="container py-5">
+  
+  <div class="row mb-4">
+    <div class="col-12 text-center">
+      <h2 class="fw-bold">みんなの日記</h2>
+      <p class="text-muted">ユーザーが公開している日記のタイムラインです。</p>
+    </div>
+  </div>
+
+  <% if @diaries.any? %>
+    <div class="row">
+      <% @diaries.each do |diary| %>
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card h-100 shadow-sm border-0 hover-shadow">
+            <div class="card-body">
+              
+              <%# ユーザー情報と日付 %>
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex align-items-center">
+                  <%# アイコン（なければイニシャル） %>
+                  <div class="bg-light rounded-circle d-flex align-items-center justify-content-center text-secondary border me-2" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                    <%= diary.user.name.first.upcase rescue "U" %>
+                  </div>
+                  <small class="fw-bold text-dark"><%= diary.user.name %></small>
+                </div>
+                <small class="text-muted" style="font-size: 0.8rem;">
+                  <%= time_ago_in_words(diary.created_at) %>前
+                </small>
+              </div>
+
+              <%# 日記本文（省略表示） %>
+              <p class="card-text text-secondary" style="font-size: 0.95rem;">
+                <%= truncate(diary.content, length: 80) %>
+              </p>
+
+              <%# AI分析ありバッジ %>
+              <% if diary.ai_response.present? %>
+                <div class="mt-2 text-end">
+                  <span class="badge bg-info bg-opacity-10 text-info border border-info rounded-pill" style="font-size: 0.7rem;">
+                    <i class="fas fa-robot"></i> AI分析あり
+                  </span>
+                </div>
+              <% end %>
+
+            </div>
+            
+            <%# フッター（詳細リンク） %>
+            <%# ※詳細画面(show)は現在「自分以外見れない仕様」になっているため、後述の修正が必要です %>
+            <%# 一旦、誰でも見れるようにリンクを貼ります %>
+            <%= link_to "", diary_path(diary), class: "stretched-link" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <%# ページネーション %>
+    <div class="d-flex justify-content-center mt-4">
+      <%= paginate @diaries %>
+    </div>
+
+  <% else %>
+    <div class="text-center py-5 bg-light rounded">
+      <p class="text-muted">公開されている日記はまだありません。</p>
+    </div>
+  <% end %>
+
+</div>

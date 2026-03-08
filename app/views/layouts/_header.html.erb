@@ -16,7 +16,12 @@
           <% if current_user %>
             <%# ログイン時 %>
             <li class="nav-item">
+              <%= link_to "About", about_path, class: "nav-link" %>
+            <li class="nav-item">
               <%= link_to "日記を書く", new_diary_path, class: "nav-link" %>
+            </li>
+            <li class="nav-item">
+              <%= link_to "日記一覧", public_index_diaries_path, class: "nav-link" %>
             </li>
             <li class="nav-item">
               <%= link_to "レビュー一覧", reviews_path, class: "nav-link" %>
@@ -31,6 +36,9 @@
             <%# 未ログイン時 %>
             <li class="nav-item">
               <%= link_to "About", about_path, class: "nav-link" %>
+            </li>
+            <li class="nav-item">
+              <%= link_to "日記一覧", public_index_diaries_path, class: "nav-link" %>
             </li>
             <li class="nav-item">
               <%= link_to "レビュー一覧", reviews_path, class: "nav-link" %>

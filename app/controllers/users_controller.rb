@@ -6,7 +6,7 @@ class UsersController < ApplicationController
   before_action :set_user, only: [:show, :edit, :update]
   
   # 本人以外が編集画面にアクセスできないようにするガード
-  before_action :ensure_correct_user, only: [:edit, :update]
+  before_action :ensure_correct_user, only: [:edit, :update, :destroy]
 
   def index
     # 今回は使用しませんが、管理画面などで使う可能性があります
@@ -33,6 +33,14 @@ class UsersController < ApplicationController
     end
   end
 
+   # アカウント削除処理
+  def destroy
+    # @user は before_action :set_user で取得済み想定
+    @user.destroy
+    reset_session # ログイン情報を破棄
+    redirect_to root_path, status: :see_other, notice: "退会しました。ご利用ありがとうございました。"
+  end
+
   private
 
   def set_user
@@ -51,4 +59,5 @@ class UsersController < ApplicationController
       redirect_to mypage_path, alert: "権限がありません。"
     end
   end
+
 end

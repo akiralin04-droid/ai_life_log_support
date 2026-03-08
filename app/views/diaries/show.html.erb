@@ -34,6 +34,8 @@
         <%# カードのフッター：操作ボタン %>
         <div class="card-footer bg-white py-3">
           <div class="d-flex justify-content-end gap-2">
+          <%# ▼▼▼ 追加: 編集ボタン ▼▼▼ %>
+            <%= link_to "編集する", edit_diary_path(@diary), class: "btn btn-outline-success btn-sm" %>
             <%# 削除ボタン：turbo_method: :delete でDELETEリクエストを送信 %>
             <%# turbo_confirm で削除前の確認ダイアログを表示 %>
             <%= link_to "削除する", diary_path(@diary), data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？" }, class: "btn btn-outline-danger btn-sm" %>
