@@ -1,2 +1,48 @@
-<h1>Admin::Dashboards#index</h1>
-<p>Find me in app/views/admin/dashboards/index.html.erb</p>
+<div class="container py-4">
+  <h2 class="mb-4 fw-bold"><i class="fas fa-cog me-2 text-secondary"></i> 管理者ダッシュボード</h2>
+  
+  <p class="text-muted mb-4">
+    AI Life Log Support のシステム全体の状況を確認・管理します。
+  </p>
+
+  <div class="row g-4 mb-5">
+    
+    <%# キャンペーン管理パネル %>
+    <div class="col-md-4">
+      <%# border-top で上部だけ色付きの線を引くお洒落なデザイン %>
+      <div class="card shadow-sm border-0 h-100 border-top border-warning border-4">
+        <div class="card-body text-center p-4">
+          <h5 class="card-title fw-bold text-dark">📢 キャンペーン管理</h5>
+          <h2 class="display-5 my-3 fw-bold"><%= @campaign_count %><span class="fs-5 text-muted ms-1">件</span></h2>
+          <p class="text-muted small">企業のキャンペーンを登録・編集します。</p>
+          <%= link_to "管理画面へ", admin_campaigns_path, class: "btn btn-outline-warning text-dark fw-bold mt-2" %>
+        </div>
+      </div>
+    </div>
+
+    <%# ユーザー管理パネル %>
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0 h-100 border-top border-primary border-4">
+        <div class="card-body text-center p-4">
+          <h5 class="card-title fw-bold text-dark">👤 ユーザー管理</h5>
+          <h2 class="display-5 my-3 fw-bold"><%= @user_count %><span class="fs-5 text-muted ms-1">人</span></h2>
+          <p class="text-muted small">登録ユーザーの確認や利用停止を行います。</p>
+          <%= link_to "管理画面へ", admin_users_path, class: "btn btn-outline-primary fw-bold mt-2" %>
+        </div>
+      </div>
+    </div>
+
+    <%# レビュー管理パネル %>
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0 h-100 border-top border-success border-4">
+        <div class="card-body text-center p-4">
+          <h5 class="card-title fw-bold text-dark">✨ レビュー管理</h5>
+          <h2 class="display-5 my-3 fw-bold"><%= @review_count %><span class="fs-5 text-muted ms-1">件</span></h2>
+          <p class="text-muted small">公開されたレビューの確認や削除を行います。</p>
+          <%= link_to "管理画面へ", admin_reviews_path, class: "btn btn-outline-success fw-bold mt-2" %>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
