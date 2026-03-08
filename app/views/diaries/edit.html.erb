@@ -1,0 +1,49 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      
+      <div class="text-center mb-4">
+        <h2 class="fw-bold">日記の編集</h2>
+      </div>
+
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+          <%= form_with model: @diary, local: true do |f| %>
+            
+            <%# エラー表示 %>
+            <% if @diary.errors.any? %>
+              <div class="alert alert-danger">
+                <ul class="mb-0 small">
+                  <% @diary.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
+
+            <%# 本文 %>
+            <div class="mb-4">
+              <%= f.label :content, "日記の内容", class: "form-label fw-bold" %>
+              <%= f.text_area :content, rows: 10, class: "form-control", placeholder: "編集内容を入力してください" %>
+            </div>
+
+            <%# 公開設定 %>
+            <div class="mb-4 form-check form-switch p-3 border rounded bg-light ms-0">
+              <div class="ms-4">
+                <%= f.check_box :is_published, class: "form-check-input", id: "publishSwitch" %>
+                <%= f.label :is_published, "公開する", class: "form-check-label fw-bold", for: "publishSwitch" %>
+              </div>
+            </div>
+
+            <%# ボタンエリア %>
+            <div class="d-grid gap-2">
+              <%= f.submit "更新する", class: "btn btn-success btn-lg fw-bold" %>
+              <%= link_to "詳細に戻る", diary_path(@diary), class: "btn btn-outline-secondary" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

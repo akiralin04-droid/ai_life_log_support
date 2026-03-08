@@ -38,7 +38,13 @@ Rails.application.routes.draw do
   resource :mypage, only: [:show]
 
   # 日記機能
-  resources :diaries
+  resources :diaries do
+    # ▼▼▼ 追加: コレクションルーティング ▼▼▼
+    collection do
+      get :public_index # 「みんなの日記」用のアクション
+    end
+  end
+
 
   # レビュー機能 (AI生成含む)
   resources :reviews do
@@ -70,4 +76,5 @@ Rails.application.routes.draw do
     resources :reviews, only: [:index, :show, :destroy, :update]
     resources :campaigns
   end
+
 end
