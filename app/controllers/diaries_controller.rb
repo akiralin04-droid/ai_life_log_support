@@ -1,7 +1,5 @@
 # 日記機能を管理するコントローラー
 class DiariesController < ApplicationController
-  # ▼▼▼ 追加: ログインしてなくても「みんなの日記」は見れるようにする ▼▼▼
-  allow_unauthenticated_access only: %i[ public_index ]
 
   # ログインしていないと日記は見れないようにする（ApplicationControllerの設定を引き継ぐ）
   # ▼▼▼ 追加: 編集・更新・削除の前に、権限チェックを行う ▼▼▼
