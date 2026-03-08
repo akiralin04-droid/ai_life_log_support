@@ -1,0 +1,27 @@
+<%# ターボフレームのIDを一意にする（例: favorite_btn_123） %>
+<div id="favorite_btn_<%= review.id %>" class="d-inline-block">
+  <% if current_user %>
+    <%# 自分が既にいいねしているか確認 %>
+    <% if review.favorites.exists?(user_id: current_user.id) %>
+      <%# --- いいね解除ボタン --- %>
+      <%= button_to review_favorites_path(review), method: :delete, class: "btn btn-sm btn-outline-danger border-0", style: "background-color: #ffeef0;" do %>
+        <i class="fas fa-heart text-danger"></i>
+        <span class="ms-1 text-danger fw-bold"><%= review.favorites.count %></span>
+      <% end %>
+    
+    <% else %>
+      <%# --- いいね登録ボタン --- %>
+      <%= button_to review_favorites_path(review), method: :post, class: "btn btn-sm btn-outline-secondary border-0" do %>
+        <i class="far fa-heart"></i>
+        <span class="ms-1"><%= review.favorites.count %></span>
+      <% end %>
+    <% end %>
+
+  <% else %>
+    <%# ログインしていない場合（ボタンだけ表示して押せない、またはログインへ誘導） %>
+    <button class="btn btn-sm btn-outline-secondary border-0" disabled>
+      <i class="far fa-heart"></i>
+      <span class="ms-1"><%= review.favorites.count %></span>
+    </button>
+  <% end %>
+</div>

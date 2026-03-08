@@ -13,14 +13,22 @@
         <h1 class="card-title fw-bold mb-3"><%= @review.title %></h1>
         
         <div class="d-flex justify-content-between align-items-center text-muted mb-4">
+          <%# 左側：ユーザー情報と日付 %>
           <div>
             <i class="fas fa-user-circle"></i> <%= @review.user.name %> さん
             <span class="mx-2">|</span>
             <%= @review.created_at.strftime('%Y/%m/%d') %>
           </div>
-          <div class="fs-5 text-warning">
+
+          <%# 右側：いいねボタン ＆ 星評価 %>
+          <div class="d-flex align-items-center gap-3">
+            <%# ▼▼▼ ：いいねボタン（非同期） ▼▼▼ %>
+            <%= render "reviews/favorites/btn", review: @review %>
+
             <%# 星の数だけ★を表示する簡易的な書き方 %>
-            <%= "★" * (@review.rating || 0) %>
+            <div class="fs-5 text-warning">
+              <%= "★" * (@review.rating || 0) %>
+            </div>
           </div>
         </div>
 
