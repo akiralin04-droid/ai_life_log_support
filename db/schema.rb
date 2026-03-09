@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_08_000002) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_09_023432) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -102,6 +102,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_08_000002) do
     t.boolean "is_published", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.float "emotion_score"
     t.index ["campaign_id"], name: "index_reviews_on_campaign_id"
     t.index ["diary_id"], name: "index_reviews_on_diary_id"
     t.index ["user_id"], name: "index_reviews_on_user_id"
@@ -234,6 +235,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_08_000002) do
     t.string "name"
     t.text "introduction"
     t.integer "role", default: 0, null: false
+    t.boolean "is_active", default: true, null: false
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
