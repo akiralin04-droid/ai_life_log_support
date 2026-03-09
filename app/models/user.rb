@@ -16,4 +16,15 @@ class User < ApplicationRecord
 
   # （0: 一般ユーザー、1: 管理者）
   enum :role, { general: 0, admin: 1 }
+
+  # 👇 ここからRansack用の設定（差し替え）
+  # 1. 検索と並び替えを許可するカラムをすべて列挙します
+  def self.ransackable_attributes(auth_object = nil)["id", "role", "is_active", "name", "email_address", "created_at"]
+  end
+
+  # 2. 検索を許可する関連テーブル（今回は使わないので空にする）
+  def self.ransackable_associations(auth_object = nil)
+    []
+  end
+
 end
