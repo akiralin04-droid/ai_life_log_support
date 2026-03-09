@@ -75,6 +75,10 @@ Rails.application.routes.draw do
     resources :users, only: [:index, :show, :update]
     resources :reviews, only: [:index, :show, :destroy, :update]
     resources :campaigns
+
+    # 管理者用「日記管理」のルーティング
+    resources :diaries, only: [:index, :show, :destroy, :update]
+
   end
 
 end

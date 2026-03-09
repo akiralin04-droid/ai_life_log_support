@@ -78,3 +78,4 @@ end
 
 # 検索機能
 gem 'ransack'
+gem "bootstrap5-kaminari-views", "~> 0.0.1"
