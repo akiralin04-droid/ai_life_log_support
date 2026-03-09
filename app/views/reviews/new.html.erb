@@ -25,8 +25,11 @@
     <div class="card shadow-sm">
       <div class="card-body">
         <%= form_with model: @review, local: true do |f| %>
-          <%# 日記IDを隠して送る（紐付け用） %>
+          <%# 日記ID、キャンペーンID、感情スコアを隠して送る（データベース保存用） %>
           <%= f.hidden_field :diary_id %>
+          <%= f.hidden_field :campaign_id %>
+          <%= f.hidden_field :emotion_score %>
+
 
           <div class="mb-3">
             <%= f.label :title, "タイトル", class: "form-label fw-bold" %>

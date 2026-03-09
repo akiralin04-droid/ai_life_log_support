@@ -38,10 +38,8 @@
             <%# ④ 感情スコアでの絞り込み（今回追加した目玉機能！） %>
             <div class="mb-5">
               <%= f.label :emotion_score_gteq, "感情の熱量 (ポジティブ度)", class: "form-label small fw-bold text-muted mb-1" %>
-              <%# AIが判定した感情スコア（例: 0.0〜1.0）をもとに、「〇〇以上」で絞り込めるようにします %>
-              <%= f.select :emotion_score_gteq,[
-                ["非常にポジティブ (熱量大)", 0.7],["ポジティブ (普通)", 0.4],
-                ["少しポジティブ", 0.1]
+              <%# AIが判定した感情スコア（0.0〜10.0）をもとに、「〇〇以上」で絞り込めるようにします %>
+              <%= f.select :emotion_score_gteq,[["非常にポジティブ (熱量80%以上)", 8.0],["ポジティブ (熱量50%以上)", 5.0],["少しポジティブ (熱量20%以上)", 2.0]
               ], { include_blank: "指定なし" }, class: "form-select" %>
             </div>
 
@@ -88,7 +86,8 @@
                 <% if review.emotion_score.present? %>
                   <div class="mb-3">
                     <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-pill">
-                      <i class="fas fa-heartbeat me-1"></i>熱量: <%= (review.emotion_score * 100).round %>%
+                      <%# AIのスコア(0.0〜10.0)に10を掛けて、%表記にします %>
+                      <i class="fas fa-heartbeat me-1"></i>熱量: <%= (review.emotion_score * 10).round %>%
                     </span>
                   </div>
                 <% end %>

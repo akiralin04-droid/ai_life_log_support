@@ -32,6 +32,25 @@
           </div>
         </div>
 
+        <%# 感情の熱量プログレスバー %>
+        <%# ========================================== %>
+        <% if @review.emotion_score.present? %>
+          <div class="mb-4 p-3 bg-danger bg-opacity-10 rounded border border-danger border-opacity-25">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="fw-bold text-danger"><i class="fas fa-fire-alt me-2"></i>AIが分析した「感情の熱量」</span>
+              <span class="fw-bold fs-5 text-danger"><%= (@review.emotion_score * 10).round %>%</span>
+            </div>
+            <div class="progress shadow-sm" style="height: 12px;">
+              <%# widthでゲージの長さをパーセンテージ指定しています %>
+              <div class="progress-bar bg-danger progress-bar-striped progress-bar-animated" role="progressbar" 
+                   style="width: <%= (@review.emotion_score * 10).round %>%;" 
+                   aria-valuenow="<%= (@review.emotion_score * 10).round %>" aria-valuemin="0" aria-valuemax="100">
+              </div>
+            </div>
+          </div>
+        <% end %>
+
+
         <hr>
 
         <%# 本文 %>
