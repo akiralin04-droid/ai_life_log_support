@@ -3,6 +3,15 @@
     <%# 日記の有無でタイトルを変更 %>
     <h2 class="text-center mb-4"><%= @diary ? "日記からレビューを生成" : "AIでレビューを作成" %></h2>
     
+    <%# --- 新規追加: キャンペーン参加中のお知らせ（UX向上） --- %>
+    <% if params[:campaign_id].present? %>
+      <div class="alert alert-warning mb-4 shadow-sm border-warning">
+        <i class="fas fa-bullhorn text-warning fs-4 align-middle me-2"></i> 
+        <strong>キャンペーン参加中！</strong><br>
+        企業の要望（プロンプト）に合わせて、AIがレビュー記事の作成を最適化してサポートします！
+      </div>
+    <% end %>
+
     <%# 日記がある場合のみ「元になる日記」を表示 %>
     <% if @diary %>
       <div class="card mb-4 shadow-sm border-0">
@@ -31,6 +40,11 @@
       <%# 日記がある場合のみ、裏側で日記IDを送信する %>
       <% if @diary %>
         <%= f.hidden_field :diary_id, value: @diary.id %>
+      <% end %>
+
+      <%# --- 新規追加: URLのcampaign_idを次のgenerateアクションへ送る（バケツリレー） --- %>
+      <% if params[:campaign_id].present? %>
+        <%= f.hidden_field :campaign_id, value: params[:campaign_id] %>
       <% end %>
 
       <div class="mb-4">
