@@ -1,2 +1,86 @@
-<h1>Admin::Users#show</h1>
-<p>Find me in app/views/admin/users/show.html.erb</p>
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold m-0">ユーザー詳細</h2>
+        <%= link_to "一覧へ戻る", admin_users_path, class: "btn btn-outline-secondary" %>
+      </div>
+
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-4">
+          <table class="table table-bordered mb-4">
+            <tbody>
+              <tr>
+                <th class="bg-light" style="width: 30%;">ID</th>
+                <td><%= @user.id %></td>
+              </tr>
+              <tr>
+                <th class="bg-light">名前</th>
+                <td><%= @user.name.presence || "未設定" %></td>
+              </tr>
+              <tr>
+                <th class="bg-light">メールアドレス</th>
+                <td><%= @user.email_address %></td>
+              </tr>
+              <tr>
+                <th class="bg-light">ステータス</th>
+                <td>
+                  <span class="badge <%= @user.is_active ? 'bg-success' : 'bg-danger' %>">
+                    <%= @user.is_active ? '有効' : '利用停止中' %>
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <th class="bg-light">自己紹介</th>
+                <td><%= @user.introduction.presence || "未設定" %></td>
+              </tr>
+              <tr>
+                <th class="bg-light">登録日時</th>
+                <td><%= @user.created_at.strftime("%Y年%m月%d日 %H:%M") %></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <%# 権限変更フォーム %>
+          <div class="p-3 bg-light rounded border">
+            <h6 class="fw-bold mb-3">権限の変更</h6>
+            <%= form_with model:[:admin, @user], local: true, class: "d-flex align-items-center" do |f| %>
+              <%= f.select :role, User.roles.keys.map { |k|[k == 'admin' ? '管理者' : '一般', k] }, {}, class: "form-select w-auto me-3" %>
+              <%= f.submit "権限を更新する", class: "btn btn-warning btn-sm" %>
+            <% end %>
+          </div>
+
+          <%# アカウント停止・再開フォーム %>
+          <div class="p-3 bg-light rounded border mb-4 border-start border-4 border-warning">
+            <h6 class="fw-bold mb-2"><i class="fas fa-user-slash me-1 text-warning"></i> アカウントの利用停止 / 再開</h6>
+            <p class="text-muted small mb-3">
+              一時的に利用を停止（ログイン不可）にする場合は、スイッチをOFFにしてください。
+            </p>
+            <%= form_with model:[:admin, @user], local: true, class: "d-flex align-items-center" do |f| %>
+              <div class="form-check form-switch fs-5 me-3 mb-0">
+                <%= f.check_box :is_active, class: "form-check-input", role: "switch" %>
+                <%= f.label :is_active, "アカウントを有効にする", class: "form-check-label fs-6" %>
+              </div>
+              <%= f.submit "ステータスを更新する", class: "btn btn-secondary btn-sm" %>
+            <% end %>
+          </div>
+
+          <%# アカウント削除エリア %>
+          <div class="p-3 rounded border border-danger bg-white">
+            <h6 class="fw-bold text-danger mb-2"><i class="fas fa-exclamation-triangle me-1"></i> アカウントの削除（Danger Zone）</h6>
+            <p class="text-muted small mb-3">
+              この操作は取り消せません。このユーザーのすべてのデータ（日記、レビュー、コメントなど）が完全に削除されます。
+            </p>
+            <% if @user == current_user %>
+              <button class="btn btn-outline-danger btn-sm" disabled>自分自身は削除できません</button>
+            <% else %>
+              <%= link_to "このユーザーを削除する", admin_user_path(@user), data: { turbo_method: :delete, turbo_confirm: "【警告】本当にこのユーザーと関連する全データを削除しますか？" }, class: "btn btn-danger btn-sm" %>
+            <% end %>
+          </div>
+          <%# 👆 ここまで追加 %>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

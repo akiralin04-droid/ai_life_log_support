@@ -1,7 +1,29 @@
 <div class="container py-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold m-0">キャンペーン管理</h2>
-    <%= link_to "＋ 新規作成", new_admin_campaign_path, class: "btn btn-primary" %>
+    <h2 class="fw-bold m-0"><i class="fas fa-bullhorn me-2 text-warning"></i> キャンペーン管理</h2>
+    <div>
+      <%= link_to "＋ 新規作成", new_admin_campaign_path, class: "btn btn-primary me-2" %>
+      <%= link_to "ダッシュボードへ戻る", admin_path, class: "btn btn-outline-secondary" %>
+    </div>
+  </div>
+
+  <%# 検索フォーム（分割版） %>
+  <div class="card shadow-sm border-0 mb-4 bg-light">
+    <div class="card-body">
+      <%= search_form_for @q, url: admin_campaigns_path, class: "row g-3" do |f| %>
+        <div class="col-md-5">
+          <%= f.label :company_name_cont, "企業名で検索", class: "form-label small fw-bold text-muted mb-1" %>
+          <%= f.search_field :company_name_cont, class: "form-control", placeholder: "（例）株式会社〇〇" %>
+        </div>
+        <div class="col-md-5">
+          <%= f.label :title_cont, "タイトルで検索", class: "form-label small fw-bold text-muted mb-1" %>
+          <%= f.search_field :title_cont, class: "form-control", placeholder: "（例）春の新作" %>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <%= f.submit "検索する", class: "btn btn-primary w-100" %>
+        </div>
+      <% end %>
+    </div>
   </div>
 
   <div class="card shadow-sm border-0">
@@ -9,40 +31,31 @@
       <table class="table table-hover align-middle mb-0">
         <thead class="table-light">
           <tr>
-            <th>状態</th>
-            <th>企業名</th>
-            <th>タイトル</th>
-            <th>終了日時</th>
+            <th><%= sort_link(@q, :is_active, "状態") %></th>
+            <th><%= sort_link(@q, :company_name, "企業名") %></th>
+            <th><%= sort_link(@q, :title, "タイトル") %></th>
+            <th><%= sort_link(@q, :end_date, "終了日時") %></th>
+            <th><%= sort_link(@q, :created_at, "登録日時") %></th>
             <th class="text-end">操作</th>
           </tr>
         </thead>
         <tbody>
           <% @campaigns.each do |campaign| %>
             <tr>
-              <td>
-                <% if campaign.is_active %>
-                  <span class="badge bg-success">公開中</span>
-                <% else %>
-                  <span class="badge bg-secondary">非公開</span>
-                <% end %>
-              </td>
+              <td><span class="badge <%= campaign.is_active ? 'bg-success' : 'bg-secondary' %>"><%= campaign.is_active ? '公開中' : '非公開' %></span></td>
               <td><%= campaign.company_name %></td>
               <td class="fw-bold"><%= campaign.title %></td>
               <td><%= campaign.end_date&.strftime("%Y/%m/%d %H:%M") || "未設定" %></td>
+              <td><%= campaign.created_at.strftime("%Y/%m/%d") %></td>
               <td class="text-end">
                 <%= link_to "詳細", admin_campaign_path(campaign), class: "btn btn-sm btn-outline-info" %>
                 <%= link_to "編集", edit_admin_campaign_path(campaign), class: "btn btn-sm btn-outline-primary" %>
-                <%= link_to "削除", admin_campaign_path(campaign), data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？" }, class: "btn btn-sm btn-outline-danger" %>
               </td>
-            </tr>
-          <% end %>
-          <% if @campaigns.empty? %>
-            <tr>
-              <td colspan="5" class="text-center text-muted py-4">キャンペーンが登録されていません。</td>
             </tr>
           <% end %>
         </tbody>
       </table>
     </div>
   </div>
+  <div class="d-flex justify-content-center mt-4"><%= paginate @campaigns, theme: 'bootstrap-5' if defined?(Kaminari) %></div>
 </div>

@@ -6,8 +6,9 @@ class Admin::CampaignsController < ApplicationController
 
   # 1. 一覧画面
   def index
-    # 作成日時の新しい順でキャンペーンを取得
-    @campaigns = Campaign.order(created_at: :desc)
+    @q = Campaign.ransack(params[:q])
+    @q.sorts = 'created_at desc' if @q.sorts.empty?
+    @campaigns = @q.result(distinct: true).page(params[:page]).per(20)
   end
 
   # 2. 詳細画面
