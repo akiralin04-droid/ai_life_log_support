@@ -1,67 +1,124 @@
-<div class="row">
-  <div class="col-12 mb-4">
-    <h2 class="fw-bold">みんなのレビュー</h2>
-    <p class="text-muted">AIと共に生まれた、新しい発見。</p>
-  </div>
-</div>
+<div class="container py-5">
+  <div class="row">
+    
+    <%# ========================================== %>
+    <%# 左側（検索パネル） %>
+    <%# col-lg-3 で、画面左の1/4を検索パネルにします %>
+    <%# ========================================== %>
+    <div class="col-lg-3 mb-4">
+      <%# sticky-top: 画面を下にスクロールしても、検索パネルがついてくるオシャレな設定です %>
+      <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
+        <div class="card-body p-4">
+          <h5 class="fw-bold mb-4"><i class="fas fa-search me-2 text-primary"></i>レビューを探す</h5>
+          
+          <%# 検索フォームの開始 %>
+          <%= search_form_for @q, url: reviews_path do |f| %>
+            
+            <%# ① キーワード検索（タイトルと本文） %>
+            <div class="mb-4">
+              <%= f.label :title_or_body_cont, "キーワード", class: "form-label small fw-bold text-muted mb-1" %>
+              <%# _cont は「文字が含まれているか」を探す命令です %>
+              <%= f.search_field :title_or_body_cont, class: "form-control", placeholder: "検索したい言葉..." %>
+            </div>
 
-<%# --- 検索フォーム --- %>
-  <div class="card shadow-sm mb-5 border-0 bg-light">
-    <div class="card-body p-4">
-      <%= search_form_for @q, url: reviews_path, class: "row g-3 align-items-end" do |f| %>
-        
-        <%# キーワード検索（タイトル または 本文） %>
-        <div class="col-md-5">
-          <%= f.label :title_or_body_cont, "キーワード", class: "form-label fw-bold text-muted small" %>
-          <%= f.search_field :title_or_body_cont, class: "form-control", placeholder: "タイトルや本文で検索..." %>
-        </div>
+            <%# ② カテゴリ検索 %>
+            <div class="mb-4">
+              <%= f.label :category_eq, "カテゴリ", class: "form-label small fw-bold text-muted mb-1" %>
+              <%# _eq は「完全一致」の命令です。モデルに定義した category_options でプルダウンを作ります %>
+              <%= f.select :category_eq, Review.category_options, { include_blank: "すべてのカテゴリ" }, class: "form-select" %>
+            </div>
 
-        <%# カテゴリ検索（以前作った日本語リストを使用） %>
-        <div class="col-md-4">
-          <%= f.label :category_eq, "カテゴリ", class: "form-label fw-bold text-muted small" %>
-          <%# モデルの定義を使って、'movie' を '2' に変換して送るようにします %>
-          <%= f.select :category_eq, Review.category_options.map { |name, key| [name, Review.categories[key]] }, { include_blank: "すべてのカテゴリ" }, class: "form-select" %>
-        </div>
+            <%# ③ 評価（星の数）での絞り込み %>
+            <div class="mb-4">
+              <%= f.label :rating_gteq, "評価 (星の数)", class: "form-label small fw-bold text-muted mb-1" %>
+              <%# _gteq は「〇〇以上」という命令です。1〜5の数字の配列を作ってプルダウンにします %>
+              <%= f.select :rating_gteq, (1..5).map { |n| ["★ #{n}以上", n] }, { include_blank: "指定なし" }, class: "form-select" %>
+            </div>
 
-        <%# 検索ボタン %>
-        <div class="col-md-3">
-          <%= f.button type: :submit, class: "btn btn-primary w-100 fw-bold" do %>
-            <i class="fas fa-search me-1"></i> 検索する
+            <%# ④ 感情スコアでの絞り込み（今回追加した目玉機能！） %>
+            <div class="mb-5">
+              <%= f.label :emotion_score_gteq, "感情の熱量 (ポジティブ度)", class: "form-label small fw-bold text-muted mb-1" %>
+              <%# AIが判定した感情スコア（例: 0.0〜1.0）をもとに、「〇〇以上」で絞り込めるようにします %>
+              <%= f.select :emotion_score_gteq,[
+                ["非常にポジティブ (熱量大)", 0.7],["ポジティブ (普通)", 0.4],
+                ["少しポジティブ", 0.1]
+              ], { include_blank: "指定なし" }, class: "form-select" %>
+            </div>
+
+            <div class="d-grid gap-2">
+              <%= f.submit "条件を絞り込む", class: "btn btn-primary fw-bold" %>
+              <%= link_to "条件をクリア", reviews_path, class: "btn btn-light btn-sm text-muted" %>
+            </div>
           <% end %>
-        </div>
-        
-      <% end %>
-    </div>
-  </div>
-
-<div class="row">
-  <% @reviews.each do |review| %>
-    <div class="col-md-6 mb-4">
-      <div class="card h-100 shadow-sm hover-shadow">
-        <div class="card-body">
-          <div class="d-flex justify-content-between mb-2">
-            <span class="badge bg-secondary">カテゴリ: <%= review.category %></span>
-            <span class="text-warning"><%= "★" * (review.rating || 0) %></span>
-          </div>
-          
-          <h5 class="card-title fw-bold">
-            <%= link_to review.title, review_path(review), class: "text-decoration-none text-dark stretched-link" %>
-          </h5>
-          
-          <%# 本文の最初の50文字だけ表示 %>
-          <p class="card-text text-muted">
-            <%= truncate(review.body, length: 50) %>
-          </p>
-        </div>
-        <div class="card-footer bg-white border-top-0 d-flex justify-content-between align-items-center">
-          <small class="text-muted">
-            <i class="fas fa-user"></i> <%= review.user.name %>
-          </small>
-          <small class="text-muted">
-            <%= time_ago_in_words(review.created_at) %>前
-          </small>
         </div>
       </div>
     </div>
-  <% end %>
+
+    <%# ========================================== %>
+    <%# 右側（レビューのカード一覧） %>
+    <%# ========================================== %>
+    <div class="col-lg-9">
+      <div class="d-flex justify-content-between align-items-end mb-4 border-bottom pb-2">
+        <h2 class="fw-bold m-0">みんなのレビュー</h2>
+        <%# total_count で、検索にヒットした全体の件数を表示します %>
+        <div class="text-muted small"><%= @reviews.total_count %>件のレビュー</div>
+      </div>
+
+      <%# row g-4 で、カードの間に隙間をあけて格子状に並べます %>
+      <div class="row g-4">
+        <% @reviews.each do |review| %>
+          <%# col-md-6 col-xl-4 で、画面幅に合わせて1列に2〜3枚のカードを並べるレスポンシブ対応をしています %>
+          <div class="col-md-6 col-xl-4">
+            <div class="card h-100 shadow-sm border-0 position-relative">
+              <div class="card-body d-flex flex-column p-4">
+                
+                <%# カテゴリバッジと星評価 %>
+                <div class="d-flex justify-content-between mb-3">
+                  <span class="badge bg-light text-dark border">
+                    <%= Review.category_options.to_h.invert[review.category] || "未設定" %>
+                  </span>
+                  <span class="text-warning fw-bold"><i class="fas fa-star me-1"></i><%= review.rating %></span>
+                </div>
+                
+                <%# タイトルと本文（truncateで長すぎる文章をカットしています） %>
+                <h5 class="card-title fw-bold mb-2"><%= truncate(review.title, length: 25) %></h5>
+                <p class="card-text text-muted small mb-4 flex-grow-1"><%= truncate(review.body, length: 60) %></p>
+                
+                <%# 感情スコアの表示（もし保存されていれば表示するオシャレなバッジ） %>
+                <% if review.emotion_score.present? %>
+                  <div class="mb-3">
+                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-pill">
+                      <i class="fas fa-heartbeat me-1"></i>熱量: <%= (review.emotion_score * 100).round %>%
+                    </span>
+                  </div>
+                <% end %>
+
+                <%# 投稿者情報と詳細ボタン %>
+                <div class="mt-auto border-top pt-3 d-flex justify-content-between align-items-center">
+                  <small class="text-muted"><i class="fas fa-user-circle me-1"></i><%= review.user&.name || "匿名" %></small>
+                  <%# stretched-link: これをつけると、カードのどこをクリックしても「詳細を見る」に飛ぶようになります %>
+                  <%= link_to "詳細を見る", review_path(review), class: "btn btn-sm btn-outline-primary stretched-link" %>
+                </div>
+                
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      
+      <%# 検索結果が0件だった場合のメッセージ %>
+      <% if @reviews.empty? %>
+        <div class="text-center py-5">
+          <i class="fas fa-search fa-3x text-light mb-3"></i>
+          <p class="text-muted fs-5">条件に一致するレビューが見つかりませんでした。</p>
+        </div>
+      <% end %>
+
+      <%# kaminariのページネーション %>
+      <div class="mt-5 d-flex justify-content-center">
+        <%= paginate @reviews, theme: 'bootstrap-5' if defined?(Kaminari) %>
+      </div>
+    </div>
+
+  </div>
 </div>

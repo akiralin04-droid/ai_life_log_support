@@ -3,12 +3,14 @@ class ReviewsController < ApplicationController
 
   # 1. 一覧画面
   def index
-    # Ransackで検索オブジェクト(@q)を作成
-    # params[:q] に検索条件が入ってきます
+    # 公開されているレビューだけを対象にして、検索オブジェクト(@q)を作ります
     @q = Review.where(is_published: true).ransack(params[:q])
     
-    # 検索結果を取得（デフォルトは作成日時の降順）
-    @reviews = @q.result(distinct: true).order(created_at: :desc)
+    # 画面の見出しがクリックされていない時は、デフォルトで新しい順に並べます
+    @q.sorts = 'created_at desc' if @q.sorts.empty?
+    
+    # 検索結果を1ページ12件ずつに分割して取得します
+    @reviews = @q.result(distinct: true).page(params[:page]).per(12)
   end
 
   # 2. 詳細画面
