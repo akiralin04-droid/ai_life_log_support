@@ -1,0 +1,61 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold m-0">日記詳細確認</h2>
+        <%= link_to "一覧へ戻る", admin_diaries_path, class: "btn btn-outline-secondary" %>
+      </div>
+
+      <%# 日記内容の表示パネル %>
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+          <span class="fw-bold text-muted">日記内容</span>
+          <span class="badge <%= @diary.is_published ? 'bg-success' : 'bg-secondary' %>">
+            <%= @diary.is_published ? '公開中' : '非公開' %>
+          </span>
+        </div>
+        <div class="card-body p-4">
+          <div class="mb-4 text-muted small border-bottom pb-3">
+            <span class="me-3"><i class="fas fa-user me-1"></i><%= @diary.user&.name || @diary.user&.email_address || "不明" %></span>
+            <span><i class="fas fa-clock me-1"></i><%= @diary.created_at.strftime("%Y年%m月%d日 %H:%M") %></span>
+          </div>
+          <div class="fs-5 mb-4" style="line-height: 1.8;">
+            <%# simple_format は、改行コード(\n)をHTMLの<br>タグに変換して、綺麗に改行して表示してくれる機能です %>
+            <%= simple_format(@diary.content) %>
+          </div>
+          
+          <%# AI関連データの表示（あれば） %>
+          <div class="bg-light p-3 rounded small">
+            <%# presence は、「空文字なら nil にする」という機能。値がない場合は "なし" と表示させます %>
+            <p class="mb-1"><strong><i class="fas fa-robot me-1"></i>AIレスポンス:</strong> <%= @diary.ai_response.presence || "なし" %></p>
+            <p class="mb-0"><strong><i class="fas fa-heartbeat me-1"></i>感情スコア:</strong> <%= @diary.emotion_score || "未計測" %></p>
+          </div>
+        </div>
+      </div>
+
+      <%# 管理者アクション（公開・非公開の切り替えフォーム） %>
+      <div class="p-3 bg-light rounded border border-start border-4 border-warning mb-4">
+        <h6 class="fw-bold mb-2"><i class="fas fa-eye-slash me-1 text-warning"></i> 公開ステータスの変更</h6>
+        <p class="text-muted small mb-3">
+          不適切な内容で「みんなの日記」に公開されている場合、強制的に「非公開」に切り替えます。
+        </p>
+        <%# この日記データ(@diary)を更新するためのフォームを作成 %>
+        <%= form_with model:[:admin, @diary], local: true, class: "d-flex align-items-center" do |f| %>
+          <div class="form-check form-switch fs-5 me-3 mb-0">
+            <%# スイッチ型のチェックボックス。ONなら true, OFFなら false が送信されます %>
+            <%= f.check_box :is_published, class: "form-check-input", role: "switch" %>
+            <%= f.label :is_published, "この日記を公開する", class: "form-check-label fs-6" %>
+          </div>
+          <%= f.submit "ステータスを更新する", class: "btn btn-secondary btn-sm" %>
+        <% end %>
+      </div>
+
+      <%# 危険操作（完全削除リンク） %>
+      <div class="p-3 rounded border border-danger bg-white">
+        <h6 class="fw-bold text-danger mb-2"><i class="fas fa-trash-alt me-1"></i> 日記の完全削除（Danger Zone）</h6>
+        <%# turbo_method: :delete で削除命令(DELETE)を送り、turbo_confirm で本当に消すかのアラートを出します %>
+        <%= link_to "この日記を完全に削除する", admin_diary_path(@diary), data: { turbo_method: :delete, turbo_confirm: "【警告】本当に削除しますか？復元できません。" }, class: "btn btn-danger btn-sm" %>
+      </div>
+    </div>
+  </div>
+</div>

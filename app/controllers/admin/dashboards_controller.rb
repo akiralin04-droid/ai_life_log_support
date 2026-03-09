@@ -5,8 +5,10 @@ class Admin::DashboardsController < ApplicationController
   def index
     # ダッシュボードに表示するため、各データの総数を取得しておく
     @user_count = User.count
+    @diary_count = Diary.count
     @review_count = Review.count
     @campaign_count = Campaign.count
+    
   end
 
   private

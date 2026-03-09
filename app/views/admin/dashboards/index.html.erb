@@ -5,14 +5,19 @@
     AI Life Log Support のシステム全体の状況を確認・管理します。
   </p>
 
+  <%# row は横並びのグループを作ります。g-4 は各パネルの隙間(gutter)の広さです %>
   <div class="row g-4 mb-5">
     
+    <%# ========================================== %>
     <%# キャンペーン管理パネル %>
-    <div class="col-md-4">
-      <%# border-top で上部だけ色付きの線を引くお洒落なデザイン %>
+    <%# col-md-3: PCサイズ(md以上)の時、画面幅の「3/12」を使う指定です。 %>
+    <%# 3 + 3 + 3 + 3 = 12 となるため、4つのパネルが横1列に綺麗に並びます。 %>
+    <%# ========================================== %>
+    <div class="col-md-3">
+      <%# border-top border-warning border-4 で上部だけに太い黄色の線を引くお洒落なデザイン %>
       <div class="card shadow-sm border-0 h-100 border-top border-warning border-4">
         <div class="card-body text-center p-4">
-          <h5 class="card-title fw-bold text-dark">📢 キャンペーン管理</h5>
+          <h5 class="card-title fw-bold text-dark">📢 キャンペーン</h5>
           <h2 class="display-5 my-3 fw-bold"><%= @campaign_count %><span class="fs-5 text-muted ms-1">件</span></h2>
           <p class="text-muted small">企業のキャンペーンを登録・編集します。</p>
           <%= link_to "管理画面へ", admin_campaigns_path, class: "btn btn-outline-warning text-dark fw-bold mt-2" %>
@@ -20,11 +25,13 @@
       </div>
     </div>
 
+    <%# ========================================== %>
     <%# ユーザー管理パネル %>
-    <div class="col-md-4">
+    <%# ========================================== %>
+    <div class="col-md-3">
       <div class="card shadow-sm border-0 h-100 border-top border-primary border-4">
         <div class="card-body text-center p-4">
-          <h5 class="card-title fw-bold text-dark">👤 ユーザー管理</h5>
+          <h5 class="card-title fw-bold text-dark">👤 ユーザー</h5>
           <h2 class="display-5 my-3 fw-bold"><%= @user_count %><span class="fs-5 text-muted ms-1">人</span></h2>
           <p class="text-muted small">登録ユーザーの確認や利用停止を行います。</p>
           <%= link_to "管理画面へ", admin_users_path, class: "btn btn-outline-primary fw-bold mt-2" %>
@@ -32,11 +39,27 @@
       </div>
     </div>
 
+    <%# ========================================== %>
+    <%# 日記管理パネル %>
+    <%# ========================================== %>
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 h-100 border-top border-info border-4">
+        <div class="card-body text-center p-4">
+          <h5 class="card-title fw-bold text-dark">📖 日記</h5>
+          <h2 class="display-5 my-3 fw-bold"><%= @diary_count %><span class="fs-5 text-muted ms-1">件</span></h2>
+          <p class="text-muted small">公開されている日記の確認や削除を行います。</p>
+          <%= link_to "管理画面へ", admin_diaries_path, class: "btn btn-outline-info fw-bold mt-2" %>
+        </div>
+      </div>
+    </div>
+
+    <%# ========================================== %>
     <%# レビュー管理パネル %>
-    <div class="col-md-4">
+    <%# ========================================== %>
+    <div class="col-md-3">
       <div class="card shadow-sm border-0 h-100 border-top border-success border-4">
         <div class="card-body text-center p-4">
-          <h5 class="card-title fw-bold text-dark">✨ レビュー管理</h5>
+          <h5 class="card-title fw-bold text-dark">✨ レビュー</h5>
           <h2 class="display-5 my-3 fw-bold"><%= @review_count %><span class="fs-5 text-muted ms-1">件</span></h2>
           <p class="text-muted small">公開されたレビューの確認や削除を行います。</p>
           <%= link_to "管理画面へ", admin_reviews_path, class: "btn btn-outline-success fw-bold mt-2" %>
@@ -44,5 +67,6 @@
       </div>
     </div>
 
+    
   </div>
 </div>
