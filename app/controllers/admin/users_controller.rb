@@ -10,6 +10,19 @@ class Admin::UsersController < ApplicationController
 
   def show
     @user = User.find(params[:id])
+    # 2つの独立した検索オブジェクトを作ります
+
+    # 1. 日記の検索（search_key を :q_diary にして、レビュー検索と混ざらないようにします）
+    @q_diaries = @user.diaries.ransack(params[:q_diary], search_key: :q_diary)
+    @q_diaries.sorts = 'created_at desc' if @q_diaries.sorts.empty?
+    # ページ分割も diary_page という名前をつけて独立させます（1ページ10件）
+    @diaries = @q_diaries.result(distinct: true).page(params[:diary_page]).per(10)
+
+    # 2. レビューの検索（search_key を :q_review にします）
+    @q_reviews = @user.reviews.ransack(params[:q_review], search_key: :q_review)
+    @q_reviews.sorts = 'created_at desc' if @q_reviews.sorts.empty?
+    # ページ分割も review_page という名前で独立させます（1ページ10件）
+    @reviews = @q_reviews.result(distinct: true).page(params[:review_page]).per(10)
   end
 
   def update
