@@ -1,0 +1,70 @@
+<div class="container py-5">
+  
+  <%# ヘッダーエリア %>
+  <div class="row mb-4 align-items-center">
+    <div class="col">
+      <h2 class="fw-bold">日記一覧</h2>
+      <p class="text-muted small">あなたの記録した過去の日記一覧です。</p>
+    </div>
+    <div class="col-auto">
+      <%= link_to new_diary_path, class: "btn btn-primary shadow-sm fw-bold" do %>
+        <i class="fas fa-pen me-1"></i> 日記を書く
+      <% end %>
+    </div>
+  </div>
+
+  <%# 日記リスト %>
+  <% if @diaries.any? %>
+    <div class="row">
+      <% @diaries.each do |diary| %>
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card h-100 shadow-sm border-0 hover-shadow">
+            <div class="card-body">
+              
+              <%# 日付と公開ステータス %>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <small class="text-muted fw-bold">
+                  <i class="far fa-calendar-alt me-1"></i>
+                  <%= diary.created_at.strftime('%Y/%m/%d %H:%M') %>
+                </small>
+                <% if diary.is_published %>
+                  <span class="badge bg-success bg-opacity-10 text-success border border-success">公開中</span>
+                <% else %>
+                  <span class="badge bg-secondary bg-opacity-10 text-secondary border">非公開</span>
+                <% end %>
+              </div>
+
+              <%# 日記本文（省略表示） %>
+              <p class="card-text text-secondary">
+                <%= truncate(diary.content, length: 60) %>
+              </p>
+
+              <%# AI分析済みバッジ %>
+              <% if diary.ai_response.present? %>
+                <div class="mt-2">
+                  <span class="badge bg-info bg-opacity-10 text-info border border-info rounded-pill">
+                    <i class="fas fa-robot me-1"></i> AI分析あり
+                  </span>
+                </div>
+              <% end %>
+
+            </div>
+            
+            <%# フッター（詳細リンク） %>
+            <div class="card-footer bg-white border-top-0 d-flex justify-content-end pb-3">
+              <%= link_to "詳細を見る", diary_path(diary), class: "btn btn-sm btn-outline-primary stretched-link" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+  <% else %>
+    <%# データがない場合 %>
+    <div class="text-center py-5 bg-light rounded border border-dashed">
+      <p class="text-muted mb-3">まだ日記がありません。</p>
+      <%= link_to "最初の日記を書く", new_diary_path, class: "btn btn-primary" %>
+    </div>
+  <% end %>
+
+</div>

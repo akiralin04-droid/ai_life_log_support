@@ -1,0 +1,66 @@
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold m-0"><i class="fas fa-book-open me-2 text-info"></i> 日記管理</h2>
+    <%= link_to "ダッシュボードへ戻る", admin_path, class: "btn btn-outline-secondary" %>
+  </div>
+
+  <%# Ransackの検索フォーム（分割版） %>
+  <div class="card shadow-sm border-0 mb-4 bg-light">
+    <div class="card-body">
+      <%= search_form_for @q, url: admin_diaries_path, class: "row g-3" do |f| %>
+        <div class="col-md-5">
+          <%# user_name_cont は「紐づくユーザー(user)の、名前(name)に、含まれる(cont)」というRansackの命令です %>
+          <%= f.label :user_name_cont, "ユーザー名で検索", class: "form-label small fw-bold text-muted mb-1" %>
+          <%= f.search_field :user_name_cont, class: "form-control", placeholder: "（例）山田太郎" %>
+        </div>
+        <div class="col-md-5">
+          <%= f.label :content_cont, "本文で検索", class: "form-label small fw-bold text-muted mb-1" %>
+          <%= f.search_field :content_cont, class: "form-control", placeholder: "日記の内容に含まれるキーワード..." %>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <%= f.submit "検索する", class: "btn btn-primary w-100" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%# 一覧表示テーブル %>
+  <div class="card shadow-sm border-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <%# sort_link を使うと、見出し文字が青いリンクになり、クリックするたびに昇順・降順が入れ替わる機能が作れます %>
+            <th><%= sort_link(@q, :id, "ID") %></th>
+            <th><%= sort_link(@q, :is_published, "ステータス") %></th>
+            <th>本文プレビュー</th>
+            <th>投稿者</th>
+            <th><%= sort_link(@q, :created_at, "投稿日時") %></th>
+            <th class="text-end">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @diaries.each do |diary| %>
+            <tr>
+              <td><%= diary.id %></td>
+              <td>
+                <%# if文を短く書いた三項演算子 (条件 ? 本当の時 : 嘘の時) を使って、バッジの色と文字を切り替えています %>
+                <span class="badge <%= diary.is_published ? 'bg-success' : 'bg-secondary' %>"><%= diary.is_published ? '公開中' : '非公開' %></span>
+              </td>
+              <%# truncate はRailsの便利機能。長過ぎる文章を指定した文字数（今回は30文字）でカットし、「...」をつけてくれます %>
+              <td><%= truncate(diary.content, length: 30) %></td>
+              <%# ユーザーが削除済みで user が存在しない場合（nil）にエラーにならないよう、ぼっち演算子（&.）を使っています %>
+              <td><%= diary.user&.name || diary.user&.email_address || "不明" %></td>
+              <td><%= diary.created_at.strftime("%Y/%m/%d %H:%M") %></td>
+              <td class="text-end">
+                <%= link_to "詳細", admin_diary_path(diary), class: "btn btn-sm btn-outline-info" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <%# kaminariによるページ番号（1, 2, 3... 次へ）を表示する部分 %>
+  <div class="d-flex justify-content-center mt-4"><%= paginate @diaries, theme: 'bootstrap-5' if defined?(Kaminari) %></div>
+</div>

@@ -1,0 +1,66 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+          
+          <%# タイトル %>
+          <div class="text-center mb-4">
+            <h2 class="fw-bold">ログイン</h2>
+            <p class="text-muted small">登録したメールアドレスとパスワードを入力してください。</p>
+          </div>
+
+          <%# フラッシュメッセージ（エラー時）の表示エリア %>
+          <% if flash[:alert] %>
+            <div class="alert alert-danger text-center small">
+              <%= flash[:alert] %>
+            </div>
+          <% end %>
+
+          <%# --- ログインフォーム --- %>
+          <%= form_with url: session_path, local: true do |f| %>
+            
+            <%# メールアドレス %>
+            <div class="mb-3">
+              <%= f.label :email_address, "メールアドレス", class: "form-label fw-bold" %>
+              <%= f.email_field :email_address, class: "form-control", placeholder: "name@example.com", autofocus: true, autocomplete: "email", required: true %>
+            </div>
+
+            <%# パスワード %>
+            <div class="mb-4">
+              <div class="d-flex justify-content-between">
+                <%= f.label :password, "パスワード", class: "form-label fw-bold" %>
+                <%# パスワードリセットへのリンク %>
+                <%= link_to "パスワードを忘れた場合", new_password_path, class: "small text-decoration-none" %>
+              </div>
+              <%= f.password_field :password, class: "form-control", placeholder: "パスワードを入力", autocomplete: "current-password", required: true %>
+            </div>
+
+            <%# ログインボタン %>
+            <div class="d-grid gap-2 mb-4">
+              <%= f.submit "ログイン", class: "btn btn-primary btn-lg fw-bold" %>
+            </div>
+          <% end %>
+
+          <hr class="my-4 text-secondary opacity-25">
+
+          <%# --- ゲストログイン（UX向上のため配置） --- %>
+          <div class="d-grid gap-2 mb-3">
+            <%= button_to session_guest_login_path, class: "btn btn-warning fw-bold text-dark w-100" do %>
+              <i class="fas fa-user-check me-1"></i> ゲストログイン (閲覧用)
+            <% end %>
+          </div>
+
+          <%# --- 新規登録への誘導 --- %>
+          <div class="text-center mt-3">
+            <span class="text-muted small">アカウントをお持ちでないですか？</span><br>
+            <%= link_to "新規登録はこちら", new_registration_path, class: "fw-bold text-primary text-decoration-none" %>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,73 @@
+<%# 画面全体を中央寄せにするための箱 %>
+<%# row: 横並びの行を作る / justify-content-center: 中身を真ん中に寄せる %>
+<div class="row justify-content-center">
+  
+  <%# 入力フォームの幅を決める箱 %>
+  <%# col-md-6: 画面幅の半分(6/12)のサイズを使う %>
+  <div class="col-md-6">
+    
+    <%# タイトル：中央揃え(text-center)、下に余白(mb-4) %>
+    <h2 class="text-center mb-4">新規登録</h2>
+
+    <%# エラーメッセージ表示エリア %>
+    <%# @user.errors.any? : もし保存失敗のエラーがあれば表示する %>
+    <% if @user.errors.any? %>
+      <div class="alert alert-danger"> <%# 赤い警告ボックス %>
+        <ul class="mb-0">
+          <%# エラー内容を1つずつ取り出してリスト表示する %>
+          <% @user.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%# 入力フォームのカード（枠） %>
+    <%# card: 白いカード型デザイン / shadow-sm: 軽い影をつける %>
+    <div class="card shadow-sm">
+      <div class="card-body"> <%# カードの中身 %>
+        
+        <%# フォームの開始 %>
+        <%# model: @user → Userモデル用のフォームを作る %>
+        <%# url: registration_path → 送信先は createアクション %>
+        <%= form_with model: @user, url: registration_path, local: true do |f| %>
+          
+          <%# ニックネーム入力欄 %>
+          <div class="mb-3"> <%# 下に余白(margin-bottom) %>
+            <%= f.label :name, "ニックネーム", class: "form-label" %>
+            <%# form-control: Bootstrapの綺麗な入力欄にするクラス %>
+            <%= f.text_field :name, class: "form-control", placeholder: "例：AIタロウ", autofocus: true %>
+          </div>
+
+          <%# メールアドレス入力欄 %>
+          <div class="mb-3">
+            <%= f.label :email_address, "メールアドレス", class: "form-label" %>
+            <%= f.email_field :email_address, class: "form-control", placeholder: "sample@example.com" %>
+          </div>
+
+          <%# パスワード入力欄 %>
+          <div class="mb-3">
+            <%= f.label :password, "パスワード", class: "form-label" %>
+            <%= f.password_field :password, class: "form-control", placeholder: "6文字以上" %>
+          </div>
+
+          <%# パスワード確認入力欄 %>
+          <div class="mb-3">
+            <%= f.label :password_confirmation, "パスワード（確認用）", class: "form-label" %>
+            <%= f.password_field :password_confirmation, class: "form-control" %>
+          </div>
+
+          <%# 登録ボタン %>
+          <div class="d-grid gap-2"> <%# ボタンを横幅いっぱいに広げる設定 %>
+            <%= f.submit "登録する", class: "btn btn-primary" %> <%# 青いボタン %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# ログイン画面へのリンク %>
+    <div class="text-center mt-3">
+      <%= link_to "ログインはこちら", new_session_path %>
+    </div>
+  </div>
+</div>

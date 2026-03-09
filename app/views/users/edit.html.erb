@@ -1,0 +1,77 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      
+      <div class="card shadow-sm">
+        <div class="card-header bg-white py-3">
+          <h4 class="mb-0 fw-bold text-center">プロフィール編集</h4>
+        </div>
+        
+        <div class="card-body p-4">
+          <%# フォーム開始 (画像送信のために multipart: true が自動付与されます) %>
+          <%= form_with(model: @user, local: true) do |f| %>
+            
+            <%# エラーメッセージ表示 %>
+            <% if @user.errors.any? %>
+              <div class="alert alert-danger">
+                <ul class="mb-0 ps-3">
+                  <% @user.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
+
+            <%# --- プロフィール画像 --- %>
+            <div class="mb-4 text-center">
+              <div class="mb-3">
+                <% if @user.profile_image.attached? %>
+                  <%# 登録済みの画像を表示 %>
+                  <%= image_tag @user.profile_image, class: "rounded-circle border", style: "width: 120px; height: 120px; object-fit: cover;" %>
+                <% else %>
+                  <%# デフォルト表示 %>
+                  <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center text-secondary fw-bold border" style="width: 120px; height: 120px; font-size: 3rem;">
+                    <%= @user.name.first.upcase rescue "U" %>
+                  </div>
+                <% end %>
+              </div>
+              
+              <div class="d-inline-block text-start">
+                <%= f.label :profile_image, "アイコン画像を変更", class: "form-label fw-bold text-muted small" %>
+                <%= f.file_field :profile_image, class: "form-control form-control-sm", accept: "image/*" %>
+              </div>
+            </div>
+
+            <%# --- 名前 --- %>
+            <div class="mb-3">
+              <%= f.label :name, "ニックネーム", class: "form-label fw-bold" %>
+              <%= f.text_field :name, class: "form-control", placeholder: "例: 山田 太郎" %>
+            </div>
+
+            <%# --- 自己紹介 --- %>
+            <div class="mb-4">
+              <%= f.label :introduction, "自己紹介", class: "form-label fw-bold" %>
+              <%= f.text_area :introduction, rows: 5, class: "form-control", placeholder: "あなたの趣味や好きなことについて書いてみましょう" %>
+              <div class="form-text">200文字以内で入力してください。</div>
+            </div>
+
+            <%# --- ボタンエリア --- %>
+            <div class="d-grid gap-2">
+              <%= f.submit "更新する", class: "btn btn-dark fw-bold" %>
+              <%= link_to "マイページに戻る", mypage_path, class: "btn btn-outline-secondary" %>
+            </div>
+
+            <%# ▼▼▼ 追加: 退会エリア ▼▼▼ %>
+            <hr>
+            <div class="text-center">
+              <p class="text-muted small">アカウントを削除しますか？</p>
+              <%= button_to "退会する", user_path(@user), method: :delete, data: { turbo_confirm: "本当に退会しますか？\n保存されたデータは全て削除されます。" }, class: "btn btn-link text-danger text-decoration-none btn-sm" %>
+            </div>
+            
+          <% end %>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

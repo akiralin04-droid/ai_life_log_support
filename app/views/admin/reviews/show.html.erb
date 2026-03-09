@@ -1,0 +1,58 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold m-0">レビュー詳細確認</h2>
+        <%= link_to "一覧へ戻る", admin_reviews_path, class: "btn btn-outline-secondary" %>
+      </div>
+
+      <%# レビュー内容の確認パネル %>
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+          <span class="fw-bold text-muted">投稿内容</span>
+          <span class="badge <%= @review.is_published ? 'bg-success' : 'bg-secondary' %>">
+            <%= @review.is_published ? '公開中' : '非公開' %>
+          </span>
+        </div>
+        <div class="card-body p-4">
+          <h3 class="fw-bold mb-3"><%= @review.title %></h3>
+          
+          <div class="mb-4 text-muted small border-bottom pb-3">
+            <span class="me-3"><i class="fas fa-user me-1"></i><%= @review.user&.name || @review.user&.email_address || "不明" %></span>
+            <span class="me-3"><i class="fas fa-clock me-1"></i><%= @review.created_at.strftime("%Y年%m月%d日 %H:%M") %></span>
+            <span><i class="fas fa-star text-warning me-1"></i>評価: <%= @review.rating %> / 5</span>
+          </div>
+
+          <div class="fs-5" style="line-height: 1.8;">
+            <%= simple_format(@review.body) %>
+          </div>
+        </div>
+      </div>
+
+      <%# 管理者アクション（公開・非公開の切り替え） %>
+      <div class="p-3 bg-light rounded border border-start border-4 border-warning mb-4">
+        <h6 class="fw-bold mb-2"><i class="fas fa-eye-slash me-1 text-warning"></i> 公開ステータスの変更</h6>
+        <p class="text-muted small mb-3">
+          不適切な内容が含まれている場合、ここで強制的に「非公開」に切り替えることができます。
+        </p>
+        <%= form_with model:[:admin, @review], local: true, class: "d-flex align-items-center" do |f| %>
+          <div class="form-check form-switch fs-5 me-3 mb-0">
+            <%= f.check_box :is_published, class: "form-check-input", role: "switch" %>
+            <%= f.label :is_published, "このレビューを公開する", class: "form-check-label fs-6" %>
+          </div>
+          <%= f.submit "ステータスを更新する", class: "btn btn-secondary btn-sm" %>
+        <% end %>
+      </div>
+
+      <%# 危険操作（完全削除） %>
+      <div class="p-3 rounded border border-danger bg-white">
+        <h6 class="fw-bold text-danger mb-2"><i class="fas fa-trash-alt me-1"></i> レビューの完全削除（Danger Zone）</h6>
+        <p class="text-muted small mb-3">
+          スパムや規約違反など、システム上から完全に消し去る場合はこちらを使用してください。
+        </p>
+        <%= link_to "このレビューを完全に削除する", admin_review_path(@review), data: { turbo_method: :delete, turbo_confirm: "【警告】本当に削除しますか？復元できません。" }, class: "btn btn-danger btn-sm" %>
+      </div>
+
+    </div>
+  </div>
+</div>

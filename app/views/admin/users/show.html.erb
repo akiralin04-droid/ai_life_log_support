@@ -1,0 +1,175 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold m-0">ユーザー詳細</h2>
+        <%= link_to "一覧へ戻る", admin_users_path, class: "btn btn-outline-secondary" %>
+      </div>
+
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-4">
+          <table class="table table-bordered mb-4">
+            <tbody>
+              <tr>
+                <th class="bg-light" style="width: 30%;">ID</th>
+                <td><%= @user.id %></td>
+              </tr>
+              <tr>
+                <th class="bg-light">名前</th>
+                <td><%= @user.name.presence || "未設定" %></td>
+              </tr>
+              <tr>
+                <th class="bg-light">メールアドレス</th>
+                <td><%= @user.email_address %></td>
+              </tr>
+              <tr>
+                <th class="bg-light">ステータス</th>
+                <td>
+                  <span class="badge <%= @user.is_active ? 'bg-success' : 'bg-danger' %>">
+                    <%= @user.is_active ? '有効' : '利用停止中' %>
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <th class="bg-light">自己紹介</th>
+                <td><%= @user.introduction.presence || "未設定" %></td>
+              </tr>
+              <tr>
+                <th class="bg-light">登録日時</th>
+                <td><%= @user.created_at.strftime("%Y年%m月%d日 %H:%M") %></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <%# 権限変更フォーム %>
+          <div class="p-3 bg-light rounded border mb-4">
+            <h6 class="fw-bold mb-3">権限の変更</h6>
+            <%= form_with model:[:admin, @user], local: true, class: "d-flex align-items-center" do |f| %>
+              <%= f.select :role, User.roles.keys.map { |k|[k == 'admin' ? '管理者' : '一般', k] }, {}, class: "form-select w-auto me-3" %>
+              <%= f.submit "権限を更新する", class: "btn btn-warning btn-sm" %>
+            <% end %>
+          </div>
+
+          <%# アカウント停止・再開フォーム %>
+          <div class="p-3 bg-light rounded border mb-4 border-start border-4 border-warning">
+            <h6 class="fw-bold mb-2"><i class="fas fa-user-slash me-1 text-warning"></i> アカウントの利用停止 / 再開</h6>
+            <p class="text-muted small mb-3">
+              一時的に利用を停止（ログイン不可）にする場合は、スイッチをOFFにしてください。
+            </p>
+            <%= form_with model:[:admin, @user], local: true, class: "d-flex align-items-center" do |f| %>
+              <div class="form-check form-switch fs-5 me-3 mb-0">
+                <%= f.check_box :is_active, class: "form-check-input", role: "switch" %>
+                <%= f.label :is_active, "アカウントを有効にする", class: "form-check-label fs-6" %>
+              </div>
+              <%= f.submit "ステータスを更新する", class: "btn btn-secondary btn-sm" %>
+            <% end %>
+          </div>
+
+          <%# アカウント削除エリア %>
+          <div class="p-3 rounded border border-danger bg-white">
+            <h6 class="fw-bold text-danger mb-2"><i class="fas fa-exclamation-triangle me-1"></i> アカウントの削除（Danger Zone）</h6>
+            <p class="text-muted small mb-3">
+              この操作は取り消せません。このユーザーのすべてのデータ（日記、レビュー、コメントなど）が完全に削除されます。
+            </p>
+            <% if @user == current_user %>
+              <button class="btn btn-outline-danger btn-sm" disabled>自分自身は削除できません</button>
+            <% else %>
+              <%= link_to "このユーザーを削除する", admin_user_path(@user), data: { turbo_method: :delete, turbo_confirm: "【警告】本当にこのユーザーと関連する全データを削除しますか？" }, class: "btn btn-danger btn-sm" %>
+            <% end %>
+          </div>
+
+          
+          <%# ユーザーの投稿履歴確認エリア（左右分割＆検索付き） %>
+
+          <hr class="my-5"> <%# 画面の区切り線 %>
+          <h4 class="fw-bold mb-4"><i class="fas fa-history me-2 text-secondary"></i>このユーザーの投稿履歴</h4>
+
+          <%# row クラスを使うことで、中の要素を横並びに分割できます %>
+          <div class="row g-4">
+            
+            <%# ------------------------------- %>
+            <%# 左側半分：日記エリア %>
+            <%# col-lg-6 で、PCサイズの時に画面の半分（6/12）の幅を使います %>
+            <%# ------------------------------- %>
+            <div class="col-lg-6">
+              <h5 class="fw-bold mb-3"><i class="fas fa-book-open me-2 text-info"></i>日記 (<%= @user.diaries.count %>件)</h5>
+              
+              <%# 日記の検索フォーム（as: :q_diary でコントローラーと連携します） %>
+              <div class="bg-light p-2 rounded mb-3 border">
+                <%= search_form_for @q_diaries, as: :q_diary, url: admin_user_path(@user), class: "d-flex" do |f| %>
+                  <%= f.search_field :content_cont, class: "form-control form-control-sm me-2", placeholder: "本文で検索..." %>
+                  <%= f.submit "検索", class: "btn btn-primary btn-sm" %>
+                <% end %>
+              </div>
+
+              <%# 日記リスト %>
+              <div class="card shadow-sm border-0">
+                <%# style="max-height: 400px; overflow-y: auto;" で、長過ぎる場合はスクロールできるようにします %>
+                <ul class="list-group list-group-flush" style="max-height: 400px; overflow-y: auto;">
+                  <% @diaries.each do |diary| %>
+                    <li class="list-group-item p-3">
+                      <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge <%= diary.is_published ? 'bg-success' : 'bg-secondary' %>"><%= diary.is_published ? '公開中' : '非公開' %></span>
+                        <%= link_to "管理", admin_diary_path(diary), class: "btn btn-sm btn-outline-info" %>
+                      </div>
+                      <p class="mb-1 text-break"><%= truncate(diary.content, length: 40) %></p>
+                      <small class="text-muted"><%= diary.created_at.strftime("%Y/%m/%d %H:%M") %></small>
+                    </li>
+                  <% end %>
+                  <% if @diaries.empty? %>
+                    <li class="list-group-item text-muted text-center p-3">日記が見つかりません</li>
+                  <% end %>
+                </ul>
+              </div>
+              <%# 日記専用のページネーション（param_name: :diary_page で他と混ざらないようにします） %>
+              <div class="mt-3 d-flex justify-content-center">
+                <%= paginate @diaries, param_name: :diary_page, theme: 'bootstrap-5' if defined?(Kaminari) %>
+              </div>
+            </div>
+
+            <%# ------------------------------- %>
+            <%# 右側半分：レビューエリア %>
+            <%# ------------------------------- %>
+            <div class="col-lg-6">
+              <h5 class="fw-bold mb-3"><i class="fas fa-star me-2 text-success"></i>レビュー (<%= @user.reviews.count %>件)</h5>
+              
+              <%# レビューの検索フォーム（as: :q_review でコントローラーと連携します） %>
+              <div class="bg-light p-2 rounded mb-3 border">
+                <%= search_form_for @q_reviews, as: :q_review, url: admin_user_path(@user), class: "d-flex" do |f| %>
+                  <%= f.search_field :title_or_body_cont, class: "form-control form-control-sm me-2", placeholder: "タイトル・本文で検索..." %>
+                  <%= f.submit "検索", class: "btn btn-primary btn-sm" %>
+                <% end %>
+              </div>
+
+              <%# レビューリスト %>
+              <div class="card shadow-sm border-0">
+                <ul class="list-group list-group-flush" style="max-height: 400px; overflow-y: auto;">
+                  <% @reviews.each do |review| %>
+                    <li class="list-group-item p-3">
+                      <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge <%= review.is_published ? 'bg-success' : 'bg-secondary' %>"><%= review.is_published ? '公開中' : '非公開' %></span>
+                        <%= link_to "管理", admin_review_path(review), class: "btn btn-sm btn-outline-info" %>
+                      </div>
+                      <p class="fw-bold mb-1 text-break"><%= truncate(review.title, length: 30) %></p>
+                      <small class="text-muted"><%= review.created_at.strftime("%Y/%m/%d %H:%M") %></small>
+                    </li>
+                  <% end %>
+                  <% if @reviews.empty? %>
+                    <li class="list-group-item text-muted text-center p-3">レビューが見つかりません</li>
+                  <% end %>
+                </ul>
+              </div>
+              <%# レビュー専用のページネーション %>
+              <div class="mt-3 d-flex justify-content-center">
+                <%= paginate @reviews, param_name: :review_page, theme: 'bootstrap-5' if defined?(Kaminari) %>
+              </div>
+            </div>
+
+          </div>
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -23,19 +23,55 @@ test:
 
 # Store production database in the storage/ directory, which by default
 # is mounted as a persistent Docker volume in config/deploy.yml.
+# 本番環境（AWS）の設定
 production:
+  # primary（メイン）の設定をMySQL用に書き換える
   primary:
     <<: *default
-    database: storage/production.sqlite3
-  cache:
-    <<: *default
-    database: storage/production_cache.sqlite3
-    migrations_paths: db/cache_migrate
-  queue:
-    <<: *default
-    database: storage/production_queue.sqlite3
-    migrations_paths: db/queue_migrate
+    adapter: mysql2
+    encoding: utf8mb4
+    charset: utf8mb4
+    collation: utf8mb4_general_ci
+    database: <%= ENV['DB_DATABASE'] %>
+    username: <%= ENV['DB_USERNAME'] %>
+    password: <%= ENV['DB_PASSWORD'] %>
+    host: <%= ENV['DB_HOST'] %>
+
+ # 【ここを追加！】Solid Cable用の設定
   cable:
     <<: *default
-    database: storage/production_cable.sqlite3
+    adapter: mysql2
+    encoding: utf8mb4
+    charset: utf8mb4
+    collation: utf8mb4_general_ci
+    database: <%= ENV['DB_DATABASE'] %>
+    username: <%= ENV['DB_USERNAME'] %>
+    password: <%= ENV['DB_PASSWORD'] %>
+    host: <%= ENV['DB_HOST'] %>
     migrations_paths: db/cable_migrate
+
+# 【ここを追加！】Solid Queue用の設定
+  queue:
+    <<: *default
+    adapter: mysql2
+    encoding: utf8mb4
+    charset: utf8mb4
+    collation: utf8mb4_general_ci
+    database: <%= ENV['DB_DATABASE'] %>
+    username: <%= ENV['DB_USERNAME'] %>
+    password: <%= ENV['DB_PASSWORD'] %>
+    host: <%= ENV['DB_HOST'] %>
+    migrations_paths: db/queue_migrate
+
+# 【ここを追加！】Solid Cache用の設定
+  cache:
+    <<: *default
+    adapter: mysql2
+    encoding: utf8mb4
+    charset: utf8mb4
+    collation: utf8mb4_general_ci
+    database: <%= ENV['DB_DATABASE'] %>
+    username: <%= ENV['DB_USERNAME'] %>
+    password: <%= ENV['DB_PASSWORD'] %>
+    host: <%= ENV['DB_HOST'] %>
+    migrations_paths: db/cache_migrate

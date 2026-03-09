@@ -1,0 +1,46 @@
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <%# 日記の有無でタイトルを変更 %>
+    <h2 class="text-center mb-4"><%= @diary ? "日記からレビューを生成" : "AIでレビューを作成" %></h2>
+    
+    <%# 日記がある場合のみ「元になる日記」を表示 %>
+    <% if @diary %>
+      <div class="card mb-4 shadow-sm border-0">
+        <div class="card-header bg-light fw-bold">
+          元になる日記
+        </div>
+        <div class="card-body">
+          <%= @diary.content %>
+        </div>
+      </div>
+    <% else %>
+      <%# 日記がない場合のお知らせメッセージ %>
+      <div class="alert alert-warning mb-4 shadow-sm">
+        <i class="fas fa-info-circle"></i> <strong>日記を選択していません</strong><br>
+        直接テキストを入力して、AIにレビュー記事の作成を手伝ってもらうことができます！
+      </div>
+    <% end %>
+
+    <div class="alert alert-info shadow-sm">
+      <i class="fas fa-lightbulb"></i> <strong>入力のヒント</strong><br>
+      商品名、映画のタイトル、お店の名前や、具体的な感想（味、俳優の演技、使い心地など）を詳しく書いて（話して）ください。<br>
+      AIが内容を分析・整理して、レビュー記事を完成させます。
+    </div>
+
+    <%= form_with url: generate_reviews_path, method: :post, local: true do |f| %>
+      <%# 日記がある場合のみ、裏側で日記IDを送信する %>
+      <% if @diary %>
+        <%= f.hidden_field :diary_id, value: @diary.id %>
+      <% end %>
+
+      <div class="mb-4">
+        <%= f.label :detail, "詳細・具体的な感想", class: "form-label fw-bold" %>
+        <%= f.text_area :detail, rows: 6, class: "form-control", placeholder: "（例）〇〇という映画を見た。映画のアクションシーンが凄かった。特に主人公がビルから飛び降りるシーンは圧巻で..." %>
+      </div>
+
+      <div class="d-grid">
+        <%= f.submit "AIにレビューを生成してもらう ✨", class: "btn btn-success btn-lg shadow-sm" %>
+      </div>
+    <% end %>
+  </div>
+</div>

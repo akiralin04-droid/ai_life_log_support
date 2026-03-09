@@ -1,0 +1,103 @@
+<% if current_user %>
+  <%# ========================================== %>
+  <%# ログイン時（ダッシュボード）の表示 %>
+  <%# ========================================== %>
+  <div class="container py-5">
+    <h2 class="mb-4 fw-bold">ダッシュボード</h2>
+    <p class="fs-5 text-muted mb-5">何を記録しますか？</p>
+    
+    <%# ダッシュボードのメニュー（カード形式で横並び） %>
+    <div class="row g-4 mb-5">
+      <%# マイページへ %>
+      <div class="col-md-4">
+        <div class="card h-100 shadow-sm border-0 bg-light">
+          <div class="card-body text-center p-4">
+            <h5 class="card-title fw-bold">👤 マイページ</h5>
+            <p class="card-text text-muted small mt-2">過去の記録や設定を確認します。</p>
+            <%= link_to "マイページへ", mypage_path, class: "btn btn-outline-primary mt-2" %>
+          </div>
+        </div>
+      </div>
+
+      <%# 日記を書く %>
+      <div class="col-md-4">
+        <div class="card h-100 shadow-sm border-0" style="background-color: #f0f8ff;">
+          <div class="card-body text-center p-4">
+            <h5 class="card-title fw-bold">📖 日記を書く</h5>
+            <p class="card-text text-muted small mt-2">今日のできごとや感情を記録しましょう。</p>
+            <%= link_to "日記を書く", new_diary_path, class: "btn btn-primary mt-2" %>
+          </div>
+        </div>
+      </div>
+
+      <%# レビューを書く %>
+      <div class="col-md-4">
+        <div class="card h-100 shadow-sm border-0" style="background-color: #f5fffa;">
+          <div class="card-body text-center p-4">
+            <h5 class="card-title fw-bold">✨ レビューを書く</h5>
+            <p class="card-text text-muted small mt-2">AIの分析から記事を作成・共有します。</p>
+            <%= link_to "レビューを書く", select_type_reviews_path, class: "btn btn-success mt-2" %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%# お知らせ・キャンペーン情報エリア（動的化） %>
+    <div class="p-4 mb-4 bg-white rounded-3 shadow-sm border">
+      <h4 class="fw-bold fs-5 border-bottom pb-2 mb-3">📢 開催中のキャンペーン</h4>
+      
+      <%# キャンペーンが1件以上ある場合 %>
+      <% if @active_campaigns.any? %>
+        <div class="list-group list-group-flush mb-0">
+          <%# 取得したキャンペーンを1つずつ取り出して表示する（ループ） %>
+          <% @active_campaigns.each do |campaign| %>
+            <%# クリックすると、一般ユーザー向けのキャンペーン詳細画面に飛ぶリンク %>
+            <%= link_to campaign_path(campaign), class: "list-group-item list-group-item-action py-3" do %>
+              <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                <h6 class="mb-0 fw-bold text-primary">
+                  <span class="badge bg-warning text-dark me-2">キャンペーン</span>
+                  <%= campaign.title %>
+                </h6>
+                <small class="text-muted">
+                  <% if campaign.end_date %>
+                    <%= campaign.end_date.strftime("%m/%d %H:%M") %> まで
+                  <% end %>
+                </small>
+              </div>
+              <p class="mb-1 text-muted small"><i class="fas fa-building me-1"></i> <%= campaign.company_name %></p>
+              <p class="mb-0 text-muted small text-truncate"><%= campaign.description %></p>
+            <% end %>
+          <% end %>
+        </div>
+      <% else %>
+        <%# キャンペーンが1件もない場合の表示 %>
+        <p class="text-muted mb-0 py-2">現在開催中のキャンペーンはありません。</p>
+      <% end %>
+    </div>
+  </div>
+  
+
+<% else %>
+  <%# ========================================== %>
+  <%# 未ログイン時（ランディングページ）の表示 %>
+  <%# ========================================== %>
+  <div class="p-5 mb-4 bg-light rounded-3 text-center">
+    <div class="container-fluid py-5">
+      
+      <h1 class="display-5 fw-bold mb-3">AI Life Log Support</h1>
+      
+      <p class="col-lg-10 fs-4 mx-auto text-break">
+        日々の記録から、価値ある「レビュー」を。<br>
+        AIがあなたの「日記」を分析し、<span class="d-inline-block">共有できる「レビュー」を生成します。</span>
+      </p>
+      
+      <div class="mt-4 gap-3 d-sm-flex justify-content-sm-center">
+        <%= button_to "ゲストログイン（閲覧用）", session_guest_login_path, class: "btn btn-warning btn-lg px-4 gap-3" %>
+        
+        <div class="mt-3 mt-sm-0">
+          <%= link_to "新規登録して始める", new_registration_path, class: "btn btn-primary btn-lg px-4 gap-3" %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

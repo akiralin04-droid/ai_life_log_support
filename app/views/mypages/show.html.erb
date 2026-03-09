@@ -1,0 +1,208 @@
+<div class="container py-4">
+
+  <%# --- 1. プロフィール＆ダッシュボード --- %>
+  <div class="card shadow-sm mb-5">
+    <div class="card-body p-4">
+      <div class="row align-items-center">
+        
+        <%# アバター %>
+        <div class="col-md-auto text-center mb-3 mb-md-0">
+          <% if @user.profile_image.attached? %>
+            <%# 画像がある場合はそれを表示 %>
+            <%= image_tag @user.profile_image, class: "rounded-circle border shadow-sm", style: "width: 100px; height: 100px; object-fit: cover;" %>
+          <% else %>
+            <%# 画像がない場合はイニシャルを表示 %>
+            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center text-secondary fw-bold border" style: "width: 100px; height: 100px; font-size: 2.5rem;">
+              <%= @user.name.first.upcase rescue "U" %>
+            </div>
+          <% end %>
+         </div>
+
+        <%# ユーザー詳細 %>
+        <div class="col-md">
+          <div class="d-flex flex-wrap align-items-center gap-2 mb-2 justify-content-center justify-content-md-start">
+            <h2 class="fw-bold mb-0"><%= @user.name %></h2>
+            <span class="badge bg-dark fw-normal"><%= @user.role == 2 ? '管理者' : '一般会員' %></span>
+          </div>
+          
+          <p class="text-muted mb-3 text-center text-md-start">
+            <%= simple_format(@user.introduction.presence || "自己紹介文はまだ設定されていません。") %>
+          </p>
+
+          <%# 統計バッジ %>
+          <div class="d-flex gap-3 justify-content-center justify-content-md-start mb-3">
+            <div class="border rounded px-3 py-1 bg-light text-center">
+              <small class="d-block text-muted" style="font-size: 10px;">日記</small>
+              <span class="fw-bold"><%= @diary_count %></span>
+            </div>
+            <div class="border rounded px-3 py-1 bg-light text-center">
+              <small class="d-block text-muted" style="font-size: 10px;">レビュー</small>
+              <span class="fw-bold"><%= @review_count %></span>
+            </div>
+          </div>
+        </div>
+
+        <%# アクションボタン群 (UI Flows対応) %>
+        <div class="col-md-auto">
+          <div class="d-flex flex-column gap-2">
+            <%# 会員情報編集 %>
+            <%= link_to edit_user_path(@user), class: "btn btn-outline-dark btn-sm" do %>
+              <i class="fas fa-cog"></i> プロフィール編集
+            <% end %>
+            
+            <%# フォロー・フォロワー (DB未実装のため仮置き) %>
+            <button class="btn btn-outline-secondary btn-sm" disabled title="準備中">
+              <i class="fas fa-users"></i> フォローリスト
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# --- 2. タブ切り替えコンテンツ --- %>
+  
+  <%# タブのヘッダー %>
+  <ul class="nav nav-tabs mb-4" id="mypageTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active fw-bold" id="diaries-tab" data-bs-toggle="tab" data-bs-target="#diaries" type="button" role="tab">
+        <i class="fas fa-book"></i> 日記履歴
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link fw-bold" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">
+        <i class="fas fa-robot"></i> レビュー履歴
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link fw-bold" id="favorites-tab" data-bs-toggle="tab" data-bs-target="#favorites" type="button" role="tab">
+        <i class="fas fa-heart text-danger"></i> いいね一覧
+      </button>
+    </li>
+  </ul>
+
+  <%# タブの中身 %>
+  <div class="tab-content" id="mypageTabContent">
+    
+    <%# --- TAB 1: 日記履歴 --- %>
+    <div class="tab-pane fade show active" id="diaries" role="tabpanel">
+      <% if @diaries.any? %>
+        <div class="list-group shadow-sm">
+          <% @diaries.each do |diary| %>
+            <div class="list-group-item list-group-item-action p-4">
+              <div class="d-flex w-100 justify-content-between align-items-center mb-2">
+                <h5 class="mb-1 fw-bold text-dark">
+                  <%= diary.created_at.strftime('%Y年%m月%d日') %> の日記
+                </h5>
+                <small class="text-muted"><%= time_ago_in_words(diary.created_at) %>前</small>
+              </div>
+              
+              <p class="mb-2 text-secondary"><%= truncate(diary.content, length: 80) %></p>
+              
+              <div class="d-flex justify-content-between align-items-center mt-3">
+                <div>
+                  <% if diary.review %>
+                    <span class="badge bg-success bg-opacity-10 text-success border border-success">
+                      <i class="fas fa-check"></i> 分析済み
+                    </span>
+                    <span class="ms-2 text-warning">
+                      <%= "★" * (diary.review.rating || 0) %>
+                    </span>
+                  <% else %>
+                    <span class="badge bg-secondary bg-opacity-10 text-secondary border">
+                      <i class="fas fa-spinner"></i> 分析待ち
+                    </span>
+                  <% end %>
+                </div>
+                
+                <div class="btn-group">
+                  <%= link_to "詳細", diary_path(diary), class: "btn btn-sm btn-outline-primary" %>
+                  <%# 編集・削除ボタン %>
+                  <%#= link_to "編集", edit_diary_path(diary), class: "btn btn-sm btn-outline-secondary" %>
+                  <%#= link_to "削除", diary_path(diary), data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？" }, class: "btn btn-sm btn-outline-danger" %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+        <div class="mt-4 d-flex justify-content-center">
+          <%= paginate @diaries, param_name: :diaries_page %>
+        </div>
+      <% else %>
+        <div class="text-center py-5 text-muted border rounded bg-light">
+          まだ日記がありません。
+        </div>
+      <% end %>
+    </div>
+
+    <%# --- TAB 2: レビュー履歴 --- %>
+    <div class="tab-pane fade" id="reviews" role="tabpanel">
+      <div class="row">
+        <% if @reviews.any? %>
+          <% @reviews.each do |review| %>
+            <div class="col-md-6 mb-4">
+              <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between mb-2">
+                    <span class="badge bg-secondary">カテゴリ: <%= review.category || '未分類' %></span>
+                    <span class="text-warning">
+                      <%= "★" * (review.rating || 0) %>
+                    </span>
+                  </div>
+                  <h5 class="card-title fw-bold">
+                    <%= link_to review.title, review_path(review), class: "text-decoration-none text-dark" %>
+                  </h5>
+                  <div class="p-2 bg-light rounded text-muted small mt-2">
+                    <i class="fas fa-robot me-1"></i>
+                    <%= truncate(review.body, length: 60) %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+          <div class="col-12 mt-3 d-flex justify-content-center">
+            <%= paginate @reviews, param_name: :reviews_page %>
+          </div>
+        <% else %>
+          <div class="col-12 text-center py-5 text-muted border rounded bg-light">
+            まだAIレビューがありません。
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# --- TAB 3: いいね一覧 --- %>
+    <div class="tab-pane fade" id="favorites" role="tabpanel">
+      <div class="row">
+        <% if @favorite_reviews.any? %>
+          <% @favorite_reviews.each do |review| %>
+            <div class="col-md-6 mb-4">
+              <div class="card h-100 border-danger border-opacity-25 shadow-sm">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between mb-2">
+                    <span class="badge bg-danger bg-opacity-75"><i class="fas fa-heart"></i> いいね済み</span>
+                    <small class="text-muted"><%= review.user.name %>さんの投稿</small>
+                  </div>
+                  <h5 class="card-title fw-bold">
+                    <%= link_to review.title, diary_path(review.diary), class: "text-decoration-none text-dark" %>
+                  </h5>
+                  <p class="card-text text-muted small">
+                    <%= truncate(review.diary.content, length: 50) %>
+                  </p>
+                </div>
+              </div>
+            </div>
+          <% end %>
+          <div class="col-12 mt-3 d-flex justify-content-center">
+            <%= paginate @favorite_reviews, param_name: :favorites_page %>
+          </div>
+        <% else %>
+          <div class="col-12 text-center py-5 text-muted border rounded bg-light">
+            まだ「いいね」したレビューがありません。
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+  </div>
+</div>

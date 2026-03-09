@@ -18,7 +18,7 @@ gem "stimulus-rails"
 gem "jbuilder"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
-# gem "bcrypt", "~> 3.1.7"
+gem "bcrypt", "~> 3.1.7"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
@@ -38,7 +38,7 @@ gem "kamal", require: false
 gem "thruster", require: false
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-# gem "image_processing", "~> 1.2"
+gem "image_processing", "~> 1.2"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
@@ -61,3 +61,20 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+# --- 追加 Gem ---
+gem 'kaminari'       # ページネーション
+gem 'ruby-openai'    # AI機能
+gem 'dotenv-rails'   # 環境変数管理(.env)
+
+group :test do
+  gem 'rspec-rails'       # テストフレームワーク
+  gem 'factory_bot_rails' # テストデータ作成
+end
+
+group :production do
+  gem 'mysql2'
+end
+
+# 検索機能
+gem 'ransack'

@@ -1,14 +1,80 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  get "campaigns/show"
+  get "reviews/index"
+  get "reviews/new"
+  get "reviews/show"
+  get "reviews/edit"
+  get "diaries/index"
+  get "diaries/new"
+  get "diaries/show"
+  get "users/index"
+  get "users/show"
+  get "users/edit"
+  get "registrations/new"
+  get "searches/search"
+  get "homes/top"
+  get "homes/about"
+  # トップページ & About
+  root to: "homes#top"
+  get "home/about" => "homes#about", as: "about"
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
-  get "up" => "rails/health#show", as: :rails_health_check
+  # 検索
+  get "search" => "searches#search"
 
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
+  # 認証機能 (Rails 8 標準)
+  resource :session
+  resources :passwords, param: :token
+  
+  # 新規登録 (カスタム)
+  resource :registration, only: [:new, :create]
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+  # ゲストログイン (カスタム)
+  post "session/guest_login" => "sessions#guest_login"
+
+  # ユーザー機能
+  resources :users, only: [:index, :show, :edit, :update]
+
+  # マイページ (showのみ)
+  resource :mypage, only: [:show]
+
+  # 日記機能
+  resources :diaries do
+    # ▼▼▼ 追加: コレクションルーティング ▼▼▼
+    collection do
+      get :public_index # 「みんなの日記」用のアクション
+    end
+  end
+
+
+  # レビュー機能 (AI生成含む)
+  resources :reviews do
+    collection do
+      # ↓↓↓ これを追加（詳細入力画面）
+      get :select_type 
+      post :generate # AIによる下書き生成
+    end
+    # コメント・いいね (非同期)
+    resources :comments, only: [:create, :destroy], module: :reviews
+    resource :favorites, only: [:create, :destroy], module: :reviews
+  end
+
+  # キャンペーン機能
+  resources :campaigns, only: [:show]
+
+  # 管理者機能 (Namespace)
+  namespace :admin do
+    get "dashboards/index"
+    get "campaigns/index"
+    get "campaigns/new"
+    get "campaigns/edit"
+    get "reviews/index"
+    get "reviews/show"
+    get "users/index"
+    get "users/show"
+    get "/" => "dashboards#index"
+    resources :users, only: [:index, :show, :update]
+    resources :reviews, only: [:index, :show, :destroy, :update]
+    resources :campaigns
+  end
+
 end
