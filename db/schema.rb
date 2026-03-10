@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_09_023432) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_10_014322) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -37,6 +37,27 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_09_023432) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "ai_interviews", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "campaign_id"
+    t.integer "diary_id"
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_id"], name: "index_ai_interviews_on_campaign_id"
+    t.index ["diary_id"], name: "index_ai_interviews_on_diary_id"
+    t.index ["user_id"], name: "index_ai_interviews_on_user_id"
+  end
+
+  create_table "ai_messages", force: :cascade do |t|
+    t.integer "ai_interview_id", null: false
+    t.integer "role", default: 0, null: false
+    t.text "content", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ai_interview_id"], name: "index_ai_messages_on_ai_interview_id"
   end
 
   create_table "campaigns", force: :cascade do |t|
@@ -103,6 +124,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_09_023432) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.float "emotion_score"
+    t.float "user_emotion_score"
+    t.integer "display_emotion_type", default: 0, null: false
     t.index ["campaign_id"], name: "index_reviews_on_campaign_id"
     t.index ["diary_id"], name: "index_reviews_on_diary_id"
     t.index ["user_id"], name: "index_reviews_on_user_id"
@@ -241,6 +264,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_09_023432) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "ai_interviews", "campaigns"
+  add_foreign_key "ai_interviews", "diaries"
+  add_foreign_key "ai_interviews", "users"
+  add_foreign_key "ai_messages", "ai_interviews"
   add_foreign_key "campaigns", "users"
   add_foreign_key "comments", "reviews"
   add_foreign_key "comments", "users"

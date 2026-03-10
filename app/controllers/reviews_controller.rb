@@ -110,7 +110,7 @@ class ReviewsController < ApplicationController
 
   # ストロングパラメータ
   def review_params
-    params.require(:review).permit(:diary_id, :campaign_id, :title, :body, :rating, :category, :is_published, :emotion_score)
+    params.require(:review).permit(:diary_id, :campaign_id, :title, :body, :rating, :category, :is_published, :emotion_score, :user_emotion_score, :display_emotion_type)
   end
 
 end

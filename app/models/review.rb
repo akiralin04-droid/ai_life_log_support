@@ -52,4 +52,8 @@ class Review < ApplicationRecord
   def self.ransackable_associations(auth_object = nil)
     ["user", "diary", "campaign", "tags"]
   end
+
+  # 💡 どちらを公開するか。ai_score: 0 (AIのスコア) / user_score: 1 (ユーザーのスコア)
+  enum :display_emotion_type, { ai_score: 0, user_score: 1 }
+  
 end

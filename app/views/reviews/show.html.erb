@@ -32,21 +32,65 @@
           </div>
         </div>
 
-        <%# 感情の熱量プログレスバー %>
+        <%# 感情の熱量プログレスバー（権限による出し分け） %>
         <%# ========================================== %>
         <% if @review.emotion_score.present? %>
-          <div class="mb-4 p-3 bg-danger bg-opacity-10 rounded border border-danger border-opacity-25">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <span class="fw-bold text-danger"><i class="fas fa-fire-alt me-2"></i>AIが分析した「感情の熱量」</span>
-              <span class="fw-bold fs-5 text-danger"><%= (@review.emotion_score * 10).round %>%</span>
-            </div>
-            <div class="progress shadow-sm" style="height: 12px;">
-              <%# widthでゲージの長さをパーセンテージ指定しています %>
-              <div class="progress-bar bg-danger progress-bar-striped progress-bar-animated" role="progressbar" 
-                   style="width: <%= (@review.emotion_score * 10).round %>%;" 
-                   aria-valuenow="<%= (@review.emotion_score * 10).round %>" aria-valuemin="0" aria-valuemax="100">
+          <div class="mb-4 p-3 bg-light rounded border">
+            
+            <%# --- パターンA: 投稿者本人 または 管理者が見る場合（ダブルスコア表示） --- %>
+            <% if current_user == @review.user || (current_user && current_user.admin?) %>
+              <h6 class="fw-bold text-muted mb-3"><i class="fas fa-chart-bar me-2"></i>感情スコア分析（本人・管理者のみ表示）</h6>
+              
+              <%# 1. AIのスコア %>
+              <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="fw-bold text-danger small"><i class="fas fa-robot me-1"></i>AIが分析した熱量</span>
+                  <span class="fw-bold text-danger"><%= (@review.emotion_score * 10).round %>%</span>
+                </div>
+                <div class="progress shadow-sm" style="height: 10px;">
+                  <div class="progress-bar bg-danger" role="progressbar" style="width: <%= (@review.emotion_score * 10).round %>%;"></div>
+                </div>
               </div>
-            </div>
+
+              <%# 2. ユーザーのスコア（入力されている場合のみ表示） %>
+              <% if @review.user_emotion_score.present? %>
+                <div class="mb-2">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="fw-bold text-primary small"><i class="fas fa-user-edit me-1"></i>あなたが調整した熱量</span>
+                    <span class="fw-bold text-primary"><%= (@review.user_emotion_score * 10).round %>%</span>
+                  </div>
+                  <div class="progress shadow-sm" style="height: 10px;">
+                    <div class="progress-bar bg-primary" role="progressbar" style="width: <%= (@review.user_emotion_score * 10).round %>%;"></div>
+                  </div>
+                </div>
+                
+                <%# 🌟 ここが超貴重なデータ！AIとのギャップ（差分）表示 %>
+                <div class="text-end mt-2">
+                  <% gap = ((@review.user_emotion_score - @review.emotion_score) * 10).round %>
+                  <span class="badge <%= gap > 0 ? 'bg-success' : (gap < 0 ? 'bg-warning text-dark' : 'bg-secondary') %>">
+                    AIとのギャップ: <%= gap > 0 ? "+#{gap}" : gap %>%
+                  </span>
+                </div>
+              <% end %>
+
+            <%# --- パターンB: 一般ユーザーが見る場合（選んだ方だけ表示） --- %>
+            <% else %>
+              <% 
+                is_user_score = (@review.user_score? && @review.user_emotion_score.present?)
+                display_score = is_user_score ? @review.user_emotion_score : @review.emotion_score 
+                color_class = is_user_score ? "primary" : "danger"
+                icon_class = is_user_score ? "fa-user-edit" : "fa-robot"
+                label_text = is_user_score ? "レビューの熱量" : "AIが分析した熱量"
+              %>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bold text-<%= color_class %>"><i class="fas <%= icon_class %> me-2"></i><%= label_text %></span>
+                <span class="fw-bold fs-5 text-<%= color_class %>"><%= (display_score * 10).round %>%</span>
+              </div>
+              <div class="progress shadow-sm" style="height: 12px;">
+                <div class="progress-bar bg-<%= color_class %> progress-bar-striped progress-bar-animated" role="progressbar" style="width: <%= (display_score * 10).round %>%;"></div>
+              </div>
+            <% end %>
+
           </div>
         <% end %>
 

@@ -47,44 +47,18 @@
       </div>
 
       <%# --- AI分析レポートエリア --- %>
-      <div class="card border-info border-opacity-25 bg-info bg-opacity-10">
+      <div class="card border-info border-opacity-25 bg-info bg-opacity-10 mb-4">
         <div class="card-body text-center py-4">
           <h5 class="text-info fw-bold mb-3"><i class="fas fa-robot"></i> AI分析レポート</h5>
           
-          <%# AIによる分析が存在するか %>
           <% if @diary.ai_response.present? %>
-            
-            <%# AIコメント表示 %>
             <div class="text-start d-inline-block text-dark mb-3" style="max-width: 100%;">
               <i class="fas fa-quote-left text-info opacity-50 fa-2x float-start me-2"></i>
               <div style="font-size: 1.05rem; line-height: 1.8;">
                 <%= simple_format(@diary.ai_response) %>
               </div>
             </div>
-
-            <%# ▼▼▼ 追加機能: レビュー作成への導線 ▼▼▼ %>
-            <div class="mt-4 pt-3 border-top border-info border-opacity-25">
-              <% if @diary.review %>
-                <%# 既にレビューがある場合 %>
-                <p class="text-muted mb-2">この日記はすでにレビュー済みです。</p>
-                <%# レビュー詳細へのリンク（まだ画面がない場合はエラーになる可能性があります） %>
-                <%= link_to "レビューを見る", review_path(@diary.review), class: "btn btn-outline-info btn-sm" %>
-              
-              <% else %>
-                <%# レビューがまだない場合 %>
-                <p class="fw-bold text-dark mb-2">この分析を踏まえて、レビューを作成しますか？</p>
-                <p class="small text-muted mb-3">レビューとして保存すると、みんなのレビュー一覧やマイページで振り返ることができます。</p>
-                
-                <%# diary_id をパラメータとして渡して、レビュー作成画面へ遷移 %>
-                <%= link_to select_type_reviews_path(diary_id: @diary.id), class: "btn btn-success fw-bold text-white px-4 shadow-sm" do %>
-                  <i class="fas fa-magic me-1"></i> AIでレビューを作成する
-                <% end %>
-              <% end %>
-            </div>
-            <%# ▲▲▲ 追加ここまで ▲▲▲ %>
-
           <% else %>
-            <%# まだ分析されていない場合 %>
             <div class="py-3">
               <div class="spinner-border text-info mb-2" role="status">
                 <span class="visually-hidden">Loading...</span>
@@ -92,6 +66,28 @@
               <p class="text-muted mb-0">AIが分析中です...<br><small>（リロードすると表示される場合があります）</small></p>
             </div>
           <% end %>
-
         </div>
       </div>
+
+      <%# ▼▼▼ レビュー作成への導線を、AI分析の外（下）に出しました！ ▼▼▼ %>
+      <div class="card shadow-sm border-0 bg-light">
+        <div class="card-body text-center p-4">
+          <% if @diary.review %>
+            <p class="text-muted mb-2">この日記はすでにレビュー済みです。</p>
+            <%= link_to "レビューを見る", review_path(@diary.review), class: "btn btn-outline-info" %>
+          <% else %>
+            <p class="fw-bold text-dark mb-2">この日記をもとに、AIと対話してレビューを作成しますか？</p>
+            <p class="small text-muted mb-3">対話しながら感情を深掘りし、魅力的なレビューに仕上げましょう！</p>
+            
+            <%# ここも data: { turbo_method: :post } で直接チャット画面へ！ %>
+            <%= link_to ai_interviews_path(diary_id: @diary.id), data: { turbo_method: :post }, class: "btn btn-success fw-bold text-white px-4 shadow-sm rounded-pill" do %>
+              <i class="fas fa-magic me-1"></i> AIインタビューを開始する 💬✨
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      
+    </div>
+  </div>
+</div>
