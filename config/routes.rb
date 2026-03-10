@@ -1,19 +1,4 @@
 Rails.application.routes.draw do
-  get "campaigns/show"
-  get "reviews/index"
-  get "reviews/new"
-  get "reviews/show"
-  get "reviews/edit"
-  get "diaries/index"
-  get "diaries/new"
-  get "diaries/show"
-  get "users/index"
-  get "users/show"
-  get "users/edit"
-  get "registrations/new"
-  get "searches/search"
-  get "homes/top"
-  get "homes/about"
   # トップページ & About
   root to: "homes#top"
   get "home/about" => "homes#about", as: "about"
@@ -63,22 +48,13 @@ Rails.application.routes.draw do
 
   # 管理者機能 (Namespace)
   namespace :admin do
-    get "dashboards/index"
-    get "campaigns/index"
-    get "campaigns/new"
-    get "campaigns/edit"
-    get "reviews/index"
-    get "reviews/show"
-    get "users/index"
-    get "users/show"
     get "/" => "dashboards#index"
-    resources :users, only: [:index, :show, :update]
+
+    # ユーザー・レビュー・日記・キャンペーンの管理（resourcesにまとめる）
+    resources :users, only:[:index, :show, :update]
     resources :reviews, only: [:index, :show, :destroy, :update]
-    resources :campaigns
-
-    # 管理者用「日記管理」のルーティング
     resources :diaries, only: [:index, :show, :destroy, :update]
-
+    resources :campaigns
   end
 
 end
