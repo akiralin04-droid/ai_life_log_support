@@ -36,10 +36,14 @@
           <div class="card-body text-center p-4">
             <h5 class="card-title fw-bold">✨ レビューを書く</h5>
             <p class="card-text text-muted small mt-2">AIの分析から記事を作成・共有します。</p>
-            <%= link_to "レビューを書く", select_type_reviews_path, class: "btn btn-success mt-2" %>
+            <%# 🌟 修正：直接チャット画面に飛ぶボタンに変更 %>
+            <div class="d-grid mt-3">
+              <%= button_to "レビューを書く", ai_interviews_path, method: :post, class: "btn btn-success w-100 shadow-sm" %>
+            </div>
           </div>
         </div>
       </div>
+      
     </div>
 
     <%# お知らせ・キャンペーン情報エリア（動的化） %>

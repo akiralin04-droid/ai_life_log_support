@@ -89,123 +89,160 @@
     
     <%# --- TAB 1: 日記履歴 --- %>
     <div class="tab-pane fade show active" id="diaries" role="tabpanel">
-      <% if @diaries.any? %>
-        <div class="list-group shadow-sm">
-          <% @diaries.each do |diary| %>
-            <div class="list-group-item list-group-item-action p-4">
-              <div class="d-flex w-100 justify-content-between align-items-center mb-2">
-                <h5 class="mb-1 fw-bold text-dark">
-                  <%= diary.created_at.strftime('%Y年%m月%d日') %> の日記
-                </h5>
-                <small class="text-muted"><%= time_ago_in_words(diary.created_at) %>前</small>
-              </div>
-              
-              <p class="mb-2 text-secondary"><%= truncate(diary.content, length: 80) %></p>
-              
-              <div class="d-flex justify-content-between align-items-center mt-3">
-                <div>
-                  <% if diary.review %>
-                    <span class="badge bg-success bg-opacity-10 text-success border border-success">
-                      <i class="fas fa-check"></i> 分析済み
-                    </span>
-                    <span class="ms-2 text-warning">
-                      <%= "★" * (diary.review.rating || 0) %>
-                    </span>
-                  <% else %>
-                    <span class="badge bg-secondary bg-opacity-10 text-secondary border">
-                      <i class="fas fa-spinner"></i> 分析待ち
-                    </span>
-                  <% end %>
+      <%# 🌟 魔法の箱（Turbo Frame）で囲む！この中での検索やページ切り替えは画面遷移しなくなります %>
+      <%= turbo_frame_tag "diaries_frame" do %>
+        <%# 🔍 日記の検索フォーム %>
+        <%= search_form_for @q_diaries, as: :q_diaries, url: mypage_path, class: "mb-3 d-flex gap-2" do |f| %>
+          <%= f.search_field :content_cont, class: "form-control bg-light", placeholder: "日記の内容で検索..." %>
+          <%= f.submit "検索", class: "btn btn-outline-secondary px-4" %>
+        <% end %>
+
+        <% if @diaries.any? %>
+          <div class="list-group shadow-sm">
+            <% @diaries.each do |diary| %>
+              <div class="list-group-item list-group-item-action p-4">
+                <div class="d-flex w-100 justify-content-between align-items-center mb-2">
+                  <h5 class="mb-1 fw-bold text-dark"><%= diary.created_at.strftime('%Y年%m月%d日') %></h5>
+                  <small class="text-muted"><%= time_ago_in_words(diary.created_at) %>前</small>
                 </div>
                 
-                <div class="btn-group">
-                  <%= link_to "詳細", diary_path(diary), class: "btn btn-sm btn-outline-primary" %>
-                  <%# 編集・削除ボタン %>
-                  <%#= link_to "編集", edit_diary_path(diary), class: "btn btn-sm btn-outline-secondary" %>
-                  <%#= link_to "削除", diary_path(diary), data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？" }, class: "btn btn-sm btn-outline-danger" %>
+                <p class="mb-3 text-secondary" style="white-space: pre-wrap;"><%= truncate(diary.content, length: 100) %></p>
+                
+                <div class="d-flex justify-content-between align-items-center border-top pt-3">
+                  <div>
+                    <% if diary.review %>
+                      <span class="badge bg-success bg-opacity-10 text-success border border-success me-2">
+                        <i class="fas fa-check"></i> レビュー作成済み
+                      </span>
+                      <%# 💡 外の画面へ飛ぶリンクには data: { turbo_frame: "_top" } を追加して脱出させます！ %>
+                      <%= link_to "レビューを見る", review_path(diary.review), data: { turbo_frame: "_top" }, class: "btn btn-sm btn-outline-success" %>
+                    <% else %>
+                      <span class="badge bg-secondary bg-opacity-10 text-secondary border me-2">
+                        <i class="fas fa-pen"></i> レビュー未作成
+                      </span>
+                      <%= link_to ai_interviews_path(diary_id: diary.id), data: { turbo_method: :post, turbo_frame: "_top" }, class: "btn btn-sm btn-primary" do %>
+                        <i class="fas fa-magic me-1"></i> AIとレビューを作る ✨
+                      <% end %>
+                    <% end %>
+                  </div>
+                  
+                  <%= link_to "詳細", diary_path(diary), data: { turbo_frame: "_top" }, class: "btn btn-sm btn-outline-secondary" %>
                 </div>
               </div>
-            </div>
-          <% end %>
-        </div>
-        <div class="mt-4 d-flex justify-content-center">
-          <%= paginate @diaries, param_name: :diaries_page %>
-        </div>
-      <% else %>
-        <div class="text-center py-5 text-muted border rounded bg-light">
-          まだ日記がありません。
-        </div>
+            <% end %>
+          </div>
+          
+          <div class="mt-4 d-flex justify-content-center">
+            <%= paginate @diaries, param_name: :diaries_page %>
+          </div>
+        <% else %>
+          <div class="text-center py-5 text-muted border rounded bg-light">
+            まだ日記がありません。または検索に一致しませんでした。
+          </div>
+        <% end %>
       <% end %>
     </div>
 
     <%# --- TAB 2: レビュー履歴 --- %>
     <div class="tab-pane fade" id="reviews" role="tabpanel">
-      <div class="row">
-        <% if @reviews.any? %>
-          <% @reviews.each do |review| %>
-            <div class="col-md-6 mb-4">
-              <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                  <div class="d-flex justify-content-between mb-2">
-                    <span class="badge bg-secondary">カテゴリ: <%= review.category || '未分類' %></span>
-                    <span class="text-warning">
-                      <%= "★" * (review.rating || 0) %>
-                    </span>
-                  </div>
-                  <h5 class="card-title fw-bold">
-                    <%= link_to review.title, review_path(review), class: "text-decoration-none text-dark" %>
-                  </h5>
-                  <div class="p-2 bg-light rounded text-muted small mt-2">
-                    <i class="fas fa-robot me-1"></i>
-                    <%= truncate(review.body, length: 60) %>
+      <%= turbo_frame_tag "reviews_frame" do %>
+        <%# 🔍 レビューの検索フォーム %>
+        <%= search_form_for @q_reviews, as: :q_reviews, url: mypage_path, class: "mb-3 d-flex gap-2" do |f| %>
+          <%= f.search_field :title_or_body_cont, class: "form-control bg-light", placeholder: "タイトルや本文で検索..." %>
+          <%= f.submit "検索", class: "btn btn-outline-secondary px-4" %>
+        <% end %>
+
+        <div class="row">
+          <% if @reviews.any? %>
+            <% @reviews.each do |review| %>
+              <div class="col-md-6 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                      <span class="badge bg-light text-dark border"><%= Review.category_options.to_h.invert[review.category] || "未分類" %></span>
+                      <span class="text-warning fw-bold"><i class="fas fa-star me-1"></i><%= review.rating || 0 %></span>
+                    </div>
+                    
+                    <h5 class="card-title fw-bold mb-3">
+                      <%# 💡 詳細画面へ脱出 %>
+                      <%= link_to truncate(review.title, length: 25), review_path(review), data: { turbo_frame: "_top" }, class: "text-decoration-none text-dark stretched-link" %>
+                    </h5>
+
+                    <% if review.emotion_score.present? %>
+                      <% 
+                        is_user_score = (review.user_score? && review.user_emotion_score.present?)
+                        display_score = is_user_score ? review.user_emotion_score : review.emotion_score 
+                      %>
+                      <div class="mb-3">
+                        <span class="badge <%= is_user_score ? 'bg-primary text-primary border-primary' : 'bg-danger text-danger border-danger' %> bg-opacity-10 border border-opacity-25 rounded-pill">
+                          <i class="fas <%= is_user_score ? 'fa-user-edit' : 'fa-robot' %> me-1"></i>
+                          熱量: <%= (display_score * 10).round %>%
+                        </span>
+                      </div>
+                    <% end %>
                   </div>
                 </div>
               </div>
+            <% end %>
+            <div class="col-12 mt-3 d-flex justify-content-center">
+              <%= paginate @reviews, param_name: :reviews_page %>
+            </div>
+          <% else %>
+            <div class="col-12 text-center py-5 text-muted border rounded bg-light">
+              まだレビューがありません。
             </div>
           <% end %>
-          <div class="col-12 mt-3 d-flex justify-content-center">
-            <%= paginate @reviews, param_name: :reviews_page %>
-          </div>
-        <% else %>
-          <div class="col-12 text-center py-5 text-muted border rounded bg-light">
-            まだAIレビューがありません。
-          </div>
-        <% end %>
-      </div>
+        </div>
+      <% end %>
     </div>
 
     <%# --- TAB 3: いいね一覧 --- %>
     <div class="tab-pane fade" id="favorites" role="tabpanel">
-      <div class="row">
-        <% if @favorite_reviews.any? %>
-          <% @favorite_reviews.each do |review| %>
-            <div class="col-md-6 mb-4">
-              <div class="card h-100 border-danger border-opacity-25 shadow-sm">
-                <div class="card-body">
-                  <div class="d-flex justify-content-between mb-2">
-                    <span class="badge bg-danger bg-opacity-75"><i class="fas fa-heart"></i> いいね済み</span>
-                    <small class="text-muted"><%= review.user.name %>さんの投稿</small>
+      <%= turbo_frame_tag "favorites_frame" do %>
+        <%# 🔍 いいねの検索フォーム %>
+        <%= search_form_for @q_favorites, as: :q_favorites, url: mypage_path, class: "mb-3 d-flex gap-2" do |f| %>
+          <%= f.search_field :title_or_body_cont, class: "form-control bg-light", placeholder: "いいねしたレビューを検索..." %>
+          <%= f.submit "検索", class: "btn btn-outline-secondary px-4" %>
+        <% end %>
+
+        <div class="row">
+          <% if @favorite_reviews.any? %>
+            <% @favorite_reviews.each do |review| %>
+              <div class="col-md-6 mb-4">
+                <div class="card h-100 border-danger border-opacity-25 shadow-sm">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                      <span class="badge bg-danger bg-opacity-75"><i class="fas fa-heart"></i> いいね済み</span>
+                      <small class="text-muted"><%= review.user.name %>さんの投稿</small>
+                    </div>
+                    <h5 class="card-title fw-bold">
+                      <%# 💡 詳細画面へ脱出 %>
+                      <%= link_to truncate(review.title, length: 25), review_path(review), data: { turbo_frame: "_top" }, class: "text-decoration-none text-dark stretched-link" %>
+                    </h5>
+                    <% if review.emotion_score.present? %>
+                      <% display_score = (review.user_score? && review.user_emotion_score.present?) ? review.user_emotion_score : review.emotion_score %>
+                      <div class="mt-2">
+                        <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-pill">
+                          <i class="fas fa-fire-alt me-1"></i>熱量: <%= (display_score * 10).round %>%
+                        </span>
+                      </div>
+                    <% end %>
                   </div>
-                  <h5 class="card-title fw-bold">
-                    <%= link_to review.title, diary_path(review.diary), class: "text-decoration-none text-dark" %>
-                  </h5>
-                  <p class="card-text text-muted small">
-                    <%= truncate(review.diary.content, length: 50) %>
-                  </p>
                 </div>
               </div>
+            <% end %>
+            <div class="col-12 mt-3 d-flex justify-content-center">
+              <%= paginate @favorite_reviews, param_name: :favorites_page %>
+            </div>
+          <% else %>
+            <div class="col-12 text-center py-5 text-muted border rounded bg-light">
+              まだ「いいね」したレビューがありません。
             </div>
           <% end %>
-          <div class="col-12 mt-3 d-flex justify-content-center">
-            <%= paginate @favorite_reviews, param_name: :favorites_page %>
-          </div>
-        <% else %>
-          <div class="col-12 text-center py-5 text-muted border rounded bg-light">
-            まだ「いいね」したレビューがありません。
-          </div>
-        <% end %>
-      </div>
+        </div>
+      <% end %>
     </div>
 
   </div>
+
 </div>

@@ -82,12 +82,19 @@
                 <h5 class="card-title fw-bold mb-2"><%= truncate(review.title, length: 25) %></h5>
                 <p class="card-text text-muted small mb-4 flex-grow-1"><%= truncate(review.body, length: 60) %></p>
                 
-                <%# 感情スコアの表示（もし保存されていれば表示するオシャレなバッジ） %>
+                <%# 感情スコアの表示（公開設定に合わせて出し分け） %>
                 <% if review.emotion_score.present? %>
+                  <% 
+                    # 💡 公開するスコアを決定する
+                    # ユーザーが「自分のスコア」を選んでいて、かつ実際に入力されている場合はユーザースコア。それ以外はAIスコア。
+                    is_user_score = (review.user_score? && review.user_emotion_score.present?)
+                    display_score = is_user_score ? review.user_emotion_score : review.emotion_score 
+                  %>
                   <div class="mb-3">
-                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-pill">
-                      <%# AIのスコア(0.0〜10.0)に10を掛けて、%表記にします %>
-                      <i class="fas fa-heartbeat me-1"></i>熱量: <%= (review.emotion_score * 10).round %>%
+                    <%# 選ばれたスコアによって、色（赤or青）とアイコン（ロボットorペン）を変える神UI！ %>
+                    <span class="badge <%= is_user_score ? 'bg-primary text-primary border-primary' : 'bg-danger text-danger border-danger' %> bg-opacity-10 border border-opacity-25 rounded-pill">
+                      <i class="fas <%= is_user_score ? 'fa-user-edit' : 'fa-robot' %> me-1"></i>
+                      熱量: <%= (display_score * 10).round %>%
                     </span>
                   </div>
                 <% end %>

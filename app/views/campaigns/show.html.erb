@@ -44,9 +44,8 @@
 
           <%# 参加ボタン（レビュー作成画面へ） %>
           <div class="d-grid gap-2 col-md-8 mx-auto">
-            <%# URLの末尾に ?campaign_id=〇〇 を付けて、AIレビュー生成画面に遷移させます %>
-            <%= link_to select_type_reviews_path(campaign_id: @campaign.id), class: "btn btn-success btn-lg shadow-sm rounded-pill" do %>
-              <i class="fas fa-pen-fancy me-2"></i> このキャンペーンに参加してレビューを書く
+            <%= link_to ai_interviews_path(campaign_id: @campaign.id), data: { turbo_method: :post }, class: "btn btn-success btn-lg shadow-sm rounded-pill" do %>
+              <i class="fas fa-pen-fancy me-2"></i> このキャンペーンに参加してAIとレビューを書く
             <% end %>
           </div>
           

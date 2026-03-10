@@ -25,47 +25,102 @@
     <div class="card shadow-sm">
       <div class="card-body">
         <%= form_with model: @review, local: true do |f| %>
-          <%# 日記ID、キャンペーンID、感情スコアを隠して送る（データベース保存用） %>
           <%= f.hidden_field :diary_id %>
           <%= f.hidden_field :campaign_id %>
+          <%# AIのスコアは隠して保持する %>
           <%= f.hidden_field :emotion_score %>
-
 
           <div class="mb-3">
             <%= f.label :title, "タイトル", class: "form-label fw-bold" %>
-            <%# AIが作ったタイトルが最初から入る %>
             <%= f.text_field :title, class: "form-control", placeholder: "記事のタイトル" %>
           </div>
 
           <div class="mb-3">
             <%= f.label :body, "レビュー本文", class: "form-label fw-bold" %>
-            <%# AIが作った本文が最初から入る %>
             <%= f.text_area :body, rows: 12, class: "form-control", placeholder: "ここに感想を書きます" %>
           </div>
 
-          <div class="row mb-3">
+          <div class="row mb-4">
             <div class="col-md-6">
               <%= f.label :rating, "評価 (★)", class: "form-label fw-bold" %>
-              <%# 1〜5の数字を選択 %>
-              <%= f.select :rating, [["★", 1], ["★★", 2], ["★★★", 3], ["★★★★", 4], ["★★★★★", 5]], { include_blank: "選択してください" }, { class: "form-select" } %>
+              <%= f.select :rating, [["★", 1], ["★★", 2], ["★★★", 3],["★★★★", 4], ["★★★★★", 5]], { include_blank: "選択してください" }, { class: "form-select" } %>
             </div>
-            <div class="col-md-6">
-              <%= f.label :category, "カテゴリ", class: "form-label fw-bold" %>
-              <%# モデルのenum定義を使って、プルダウンメニューを表示 %>
-              <%# Reviewモデルで作った日本語リスト(category_options)を使います %>
-              <%= f.select :category, Review.category_options, {}, class: "form-select" %>
+            <div class="col-md-6 mb-3 mb-md-0">
+                <%= f.label :category, "カテゴリ", class: "form-label fw-bold" %>
+                
+                <%# 🌟 修正：.map 以降の複雑な処理を消して、シンプルに Review.category_options を使うだけにしました！ %>
+                <%= f.select :category, Review.category_options, { include_blank: "選択してください" }, class: "form-select" %>
+              </div>
+          </div>
+
+          <%# ========================================== %>
+          <%# 🌟 ここからダブル感情スコア・コントロールパネル %>
+          <%# ========================================== %>
+          <div class="card border-danger border-opacity-25 bg-danger bg-opacity-10 mb-4 shadow-sm">
+            <div class="card-body">
+              <h5 class="fw-bold text-danger mb-3"><i class="fas fa-heartbeat me-2"></i>感情の熱量（スコア）</h5>
+              
+              <%# 1. AIが算出したスコア %>
+                <div class="mb-4">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-dark fw-bold">🤖 AIの分析結果</span>
+                    <span class="badge bg-danger fs-6"><%= (@review.emotion_score.to_f * 10).round %>%</span>
+                  </div>
+                  <%# 💡 AIのバーを少し太くし、スライダーと幅を合わせました %>
+                  <div class="progress shadow-sm" style="height: 15px;">
+                    <div class="progress-bar bg-danger" role="progressbar" style="width: <%= (@review.emotion_score.to_f * 10).round %>%;"></div>
+                  </div>
+                </div>
+
+                <%# 2. ユーザーが操作するスコア（直感スライダー！） %>
+                <div class="mb-4">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <%= f.label :user_emotion_score, "👩‍💻 あなた自身が感じる熱量を調整", class: "form-label fw-bold text-dark mb-0" %>
+                    <% initial_val = @review.user_emotion_score || @review.emotion_score || 5.0 %>
+                    <span class="badge bg-primary fs-6 shadow-sm" style="min-width: 60px;" id="sliderValue">
+                      <%= (initial_val.to_f * 10).round %>%
+                    </span>
+                  </div>
+                  
+                  <%# 💡 白い背景枠を外し、プログレスバーと同じ幅(w-100)になるように配置しました %>
+                  <%= f.range_field :user_emotion_score, 
+                        in: 0.0..10.0, step: 0.1, 
+                        class: "form-range w-100", 
+                        id: "emotionSlider",
+                        value: initial_val,
+                        oninput: "document.getElementById('sliderValue').innerText = Math.round(this.value * 10) + '%'" %>
+                  <div class="text-muted small mt-1">※ツマミを動かして直感的に熱量を設定してください</div>
+                </div>
+
+              <%# 3. どちらを公開するか選択するラジオボタン %>
+              <div class="mt-3 p-3 bg-white rounded border border-danger border-opacity-25">
+                <p class="fw-bold mb-2 small">みんなのレビューに公開するスコアを選んでください</p>
+                <div class="form-check form-check-inline">
+                  <%= f.radio_button :display_emotion_type, "ai_score", class: "form-check-input text-danger" %>
+                  <%= f.label :display_emotion_type_ai_score, "AIの分析スコアを公開", class: "form-check-label small" %>
+                </div>
+                <div class="form-check form-check-inline">
+                  <%= f.radio_button :display_emotion_type, "user_score", class: "form-check-input text-danger" %>
+                  <%= f.label :display_emotion_type_user_score, "自分の調整スコアを公開", class: "form-check-label small" %>
+                </div>
+              </div>
+
             </div>
           </div>
+          <%# ========================================== %>
 
           <div class="form-check mb-4">
             <%= f.check_box :is_published, class: "form-check-input", id: "publishSwitch", checked: true %>
             <%= f.label :is_published, "公開する", class: "form-check-label", for: "publishSwitch" %>
           </div>
 
-          <div class="d-grid gap-2">
-            <%= f.submit "投稿する", class: "btn btn-primary btn-lg" %>
+          <div class="d-grid gap-3">
+            <%= f.submit "この内容で投稿する", class: "btn btn-primary btn-lg fw-bold shadow-sm" %>
+            <%= f.submit "💬 この内容をもとにAIとチャットして修正する", formaction: ai_interviews_path, formmethod: "post", class: "btn btn-outline-success btn-lg fw-bold bg-success bg-opacity-10" %>
           </div>
         <% end %>
+
+
       </div>
     </div>
   </div>

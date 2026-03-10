@@ -43,6 +43,15 @@ Rails.application.routes.draw do
     resource :favorites, only: [:create, :destroy], module: :reviews
   end
 
+  # AIチャット・インタビュー機能
+  resources :ai_interviews, only: [:show, :create] do
+    resources :ai_messages, only: [:create] # チャット内でメッセージを送信するため
+    member do
+      get :finalize  # 💡 追加 (自動遷移用)
+      post :finalize # 💡 (ボタン用)
+    end
+  end
+
   # キャンペーン機能
   resources :campaigns, only: [:show]
 

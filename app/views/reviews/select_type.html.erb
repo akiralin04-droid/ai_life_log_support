@@ -36,24 +36,23 @@
       AIが内容を分析・整理して、レビュー記事を完成させます。
     </div>
 
-    <%= form_with url: generate_reviews_path, method: :post, local: true do |f| %>
-      <%# 日記がある場合のみ、裏側で日記IDを送信する %>
+    <%= form_with url: ai_interviews_path, method: :post, local: true do |f| %>
+      
+      <%# 日記ID、キャンペーンIDを裏側で送信する（バケツリレー） %>
       <% if @diary %>
         <%= f.hidden_field :diary_id, value: @diary.id %>
       <% end %>
-
-      <%# --- 新規追加: URLのcampaign_idを次のgenerateアクションへ送る（バケツリレー） --- %>
       <% if params[:campaign_id].present? %>
         <%= f.hidden_field :campaign_id, value: params[:campaign_id] %>
       <% end %>
 
       <div class="mb-4">
-        <%= f.label :detail, "詳細・具体的な感想", class: "form-label fw-bold" %>
+        <%= f.label :detail, "詳細・具体的な感想（これがAIへの最初のメッセージになります）", class: "form-label fw-bold" %>
         <%= f.text_area :detail, rows: 6, class: "form-control", placeholder: "（例）〇〇という映画を見た。映画のアクションシーンが凄かった。特に主人公がビルから飛び降りるシーンは圧巻で..." %>
       </div>
 
       <div class="d-grid">
-        <%= f.submit "AIにレビューを生成してもらう ✨", class: "btn btn-success btn-lg shadow-sm" %>
+        <%= f.submit "AIとのインタビュー（対話）を開始する 💬✨", class: "btn btn-success btn-lg shadow-sm" %>
       </div>
     <% end %>
   </div>
