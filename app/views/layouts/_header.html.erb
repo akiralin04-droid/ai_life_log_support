@@ -12,14 +12,13 @@
       
       <%# メニュー項目 %>
       <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
+        <ul class="navbar-nav ms-auto align-items-center">
           <% if current_user %>
             <%# ========================================== %>
             <%# 管理者の場合のみ表示する特別メニュー %>
             <%# ========================================== %>
             <% if current_user.admin? %>
               <li class="nav-item me-3">
-                <%# 💡 admin_path は /admin (ダッシュボード) へのリンクです %>
                 <%= link_to "👑 管理画面", admin_path, class: "nav-link text-warning fw-bold" %>
               </li>
             <% end %>
@@ -28,11 +27,19 @@
             <%# 通常のログイン時メニュー %>
             <%# ========================================== %>
             <li class="nav-item">
+              <%= link_to "ホーム", root_path, class: "nav-link" %>
+            </li>
+            <li class="nav-item">
               <%= link_to "About", about_path, class: "nav-link" %>
-            </li> <%# 💡 ここにあった閉じ忘れを修正しました %>
+            </li>
             <li class="nav-item">
               <%= link_to "日記を書く", new_diary_path, class: "nav-link" %>
             </li>
+            
+            <li class="nav-item">
+              <%= link_to "レビューを書く", select_type_reviews_path, class: "nav-link" %>
+            </li>
+
             <li class="nav-item">
               <%= link_to "みんなの日記", public_index_diaries_path, class: "nav-link" %>
             </li>
@@ -42,8 +49,8 @@
             <li class="nav-item">
               <%= link_to "マイページ", mypage_path, class: "nav-link" %>
             </li>
-            <li class="nav-item">
-              <%= button_to "ログアウト", session_path, method: :delete, class: "nav-link btn btn-link text-decoration-none text-white-50" %>
+            <li class="nav-item ms-2">
+              <%= button_to "ログアウト", session_path, method: :delete, class: "btn btn-outline-secondary btn-sm text-white-50" %>
             </li>
           <% else %>
             <%# ========================================== %>
@@ -61,8 +68,8 @@
             <li class="nav-item">
               <%= link_to "新規登録", new_registration_path, class: "nav-link" %>
             </li>
-            <li class="nav-item">
-              <%= link_to "ログイン", new_session_path, class: "nav-link" %>
+            <li class="nav-item ms-2">
+              <%= link_to "ログイン", new_session_path, class: "btn btn-outline-light btn-sm" %>
             </li>
           <% end %>
         </ul>
