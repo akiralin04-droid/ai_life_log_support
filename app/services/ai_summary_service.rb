@@ -17,8 +17,8 @@ class AiSummaryService
       response = client.chat(
         parameters: {
           model: "gpt-3.5-turbo",
-          messages: [
-            { role: "system", content: "あなたは優秀なライフログアシスタントです。ユーザーの日記を読み、共感を示した上で、100文字程度で要約とフィードバックをしてください。" },
+          messages:[
+            { role: "system", content: "あなたは優秀なライフログアナリストです。ユーザーの日記を読み、第三者目線で「今日の良かった点」と「明日に向けた簡単なアドバイス」を整理し、200文字程度でフィードバックしてください。箇条書きなどを用いて見やすく出力してください。" },
             { role: "user", content: @content }
           ],
           temperature: 0.7,

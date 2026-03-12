@@ -6,8 +6,53 @@
         <h2 class="fw-bold">日記の編集</h2>
       </div>
 
+      <%# ▼▼▼ AI推敲（相談して書き直す）パネル ▼▼▼ %>
+      <div class="card border-warning border-opacity-50 bg-warning bg-opacity-10 mb-5 shadow-sm">
+        <div class="card-body p-4">
+          <h5 class="text-warning-emphasis fw-bold mb-3"><i class="fas fa-magic"></i> AIと相談して書き直す（推敲ループ）</h5>
+          <p class="text-muted small mb-3">
+            「もう少し感情を込めて」「文字数を増やして」「このエピソードを追加したい」など、
+            AIに修正してほしいポイントを教えてください。AIが質問を考えて深掘りしてくれます！
+          </p>
+          
+          <%= form_with url: ai_interviews_path, local: true, method: :post do |f| %>
+            <%= f.hidden_field :diary_id, value: @diary.id %>
+            <%# 目的に「推敲（修正）」を指定して送信する %>
+            <%= f.hidden_field :purpose, value: "diary_refinement" %>
+            
+            <div class="mb-3">
+              <%= f.text_area :refinement_request, rows: 3, class: "form-control border-warning", placeholder: "例：もっとフットサルの楽しさが伝わるように直して！", required: true %>
+            </div>
+            
+            <%= f.button class: "btn btn-warning fw-bold text-dark w-100 shadow-sm" do %>
+              <i class="fas fa-comments me-1"></i> 要望を伝えてAIとチャットする ✨
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
       <div class="card shadow-sm border-0">
         <div class="card-body p-4">
+        
+          <%# ▼▼▼ 編集の参考に生データを表示 ▼▼▼ %>
+          <div class="accordion mb-4" id="accordionReference">
+            <div class="accordion-item border-0 border-bottom">
+              <h2 class="accordion-header" id="headingRef">
+                <button class="accordion-button collapsed py-2 bg-light text-muted small rounded" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRef" aria-expanded="false" aria-controls="collapseRef">
+                  <i class="fas fa-info-circle text-primary me-2"></i> 編集の参考にスケジュールと生データを見る
+                </button>
+              </h2>
+              <div id="collapseRef" class="accordion-collapse collapse" aria-labelledby="headingRef" data-bs-parent="#accordionReference">
+                <div class="accordion-body p-3 bg-white text-muted small" style="white-space: pre-wrap;">
+                  <strong>【スケジュール】</strong><br>
+                  <%= @diary.schedule %><br><br>
+                  <strong>【音声の生データ】</strong><br>
+                  <%= @diary.raw_voice_text %>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <%= form_with model: @diary, local: true do |f| %>
             
             <%# エラー表示 %>

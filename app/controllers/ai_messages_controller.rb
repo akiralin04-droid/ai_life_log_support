@@ -7,16 +7,18 @@ class AiMessagesController < ApplicationController
     user_message = @ai_interview.ai_messages.build(role: :user, content: params[:content])
     
     if user_message.save
-      # 💡 ユーザーの「返信回数」を数える
       user_message_count = @ai_interview.ai_messages.where(role: :user).count
 
-      # 💡 返信が「2回目以上」なら、これ以上質問せずにレビュー生成画面へ自動遷移！
-      if user_message_count >= 2
+      # 日記モードかどうかの判定
+      is_diary_mode = !@ai_interview.review_creation?
+
+      # 💡 日記モードなら「1回」、レビューモードなら「2回」で自動遷移！
+      if (is_diary_mode && user_message_count >= 1) || (!is_diary_mode && user_message_count >= 2)
         redirect_to finalize_ai_interview_path(@ai_interview)
         return
       end
 
-      # まだ1回目なら、AIに返事（質問）をもらう
+      # まだ規定回数に達していなければ、AIに返事（質問）をもらう
       ai_response_content = fetch_ai_response(@ai_interview)
       
       if ai_response_content.present?
@@ -69,22 +71,31 @@ class AiMessagesController < ApplicationController
   # 🧠 状況に応じてAIの性格（プロンプト）を切り替えるメソッド
   # =========================================================
   def build_system_prompt(interview)
+    # ベースとなる基本の指示
     base_prompt = <<~TEXT
-      あなたはユーザーの体験や感情を深掘りし、魅力的なレビュー記事を作成するためのプロのインタビュアーです。
-      ユーザーとの自然な対話を通して、レビューに必要な情報（良かった点、気になった点、感情の動きなど）を引き出してください。
-      一度にたくさんの質問はせず、LINEのように短く、会話のキャッチボールを意識して1〜2個の質問を投げかけてください。
+      あなたはユーザーの体験や感情を優しく深掘りする、プロのインタビュアー兼カウンセラーです。
+      ユーザーとの自然な対話を通して、出来事の裏にある「感情の動き」や「具体的なエピソード」を引き出してください。
+      一度にたくさんの質問はせず、LINEのように短く、共感を示しながら1つだけ質問を投げかけてください。
       ハルシネーション（ユーザーが言っていない事実を勝手に捏造すること）は厳禁です。
     TEXT
 
     if interview.campaign_id.present?
-      # キャンペーン経由の場合は、企業のプロンプトを強力に遵守させる！
+      # 【レビュー作成（キャンペーン）モード】
       campaign_prompt = interview.campaign.ai_prompt
-      base_prompt += "\n\nさらに、今回は以下の【企業の要望（プロンプト）】を必ず守ってインタビューを進めてください。\n【企業の要望】\n#{campaign_prompt}"
+      base_prompt += "\n\n今回は以下の【企業の要望（プロンプト）】を必ず守り、レビュー作成のためのインタビューを進めてください。\n【企業の要望】\n#{campaign_prompt}"
+      
     elsif interview.diary_id.present?
-      # 日記経由の場合は、感情の引き出しに特化させる！
-      base_prompt += "\n\n今回はユーザーの『日記』をもとにインタビューしています。日記に書かれた出来事の裏にある「感情の動き」を特に深掘りして、生の声をレビューに活かせるように共感しながら対話してください。"
+      if interview.diary.content.present?
+        # 【レビュー作成（日記から）モード】（すでに日記本文が存在する場合）
+        base_prompt += "\n\n今回はユーザーの『完成した日記』をもとに、魅力的なレビューを作成するためのインタビューをしています。他の人におすすめしたいポイントを引き出してください。"
+      else
+        # 【★新規追加：日記作成（深掘り）モード】（日記本文がまだ空っぽの場合）
+        base_prompt += "\n\n今回は、箇条書きの『本日のスケジュール』をもとに、ユーザーの一日の振り返りをサポートし、「感情豊かな日記」を完成させるためのインタビューです。ユーザーの気持ちに寄り添い、一番印象に残った出来事を優しく深掘りしてください。"
+      end
     end
 
     base_prompt
   end
+
+
 end

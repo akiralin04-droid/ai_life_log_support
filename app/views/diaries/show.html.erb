@@ -24,11 +24,36 @@
 
         <%# カードのボディ：日記の本文を表示 %>
         <div class="card-body p-4">
-          <%# simple_format だと改行が多くなりすぎることがあるため、styleで調整 %>
-          <%# white-space: pre-wrap は改行コードをそのまま改行として表示するCSSです %>
-          <div class="card-text" style="white-space: pre-wrap; line-height: 1.8; color: #4b5563;">
+          <% if @diary.schedule.present? %>
+            <div class="bg-light rounded p-3 mb-4 border border-light">
+              <p class="fw-bold text-muted small mb-2"><i class="far fa-calendar-check me-1"></i> 本日の予定</p>
+              <div style="white-space: pre-wrap; font-size: 0.95rem;" class="text-secondary"><%= @diary.schedule %></div>
+            </div>
+          <% end %>
+
+          <%# 日記本文 %>
+          <div class="card-text fs-5 mb-4 text-dark" style="white-space: pre-wrap; line-height: 1.8;">
             <%= @diary.content %>
           </div>
+
+          <%# ▼▼▼ 追加: 音声の生データ（会話履歴）をアコーディオンで表示 ▼▼▼ %>
+          <% if @diary.raw_voice_text.present? %>
+            <div class="accordion accordion-flush border rounded mt-4" id="accordionVoice">
+              <div class="accordion-item border-0 bg-transparent">
+                <h2 class="accordion-header" id="headingVoice">
+                  <button class="accordion-button collapsed bg-white text-muted small py-2 shadow-none rounded" type="button" data-bs-toggle="collapse" data-bs-target="#collapseVoice" aria-expanded="false" aria-controls="collapseVoice">
+                    <i class="fas fa-microphone-alt text-danger me-2"></i> 音声入力の生データ（会話履歴）を確認する
+                  </button>
+                </h2>
+                <div id="collapseVoice" class="accordion-collapse collapse" aria-labelledby="headingVoice" data-bs-parent="#accordionVoice">
+                  <div class="accordion-body p-3 bg-light text-muted small border-top" style="white-space: pre-wrap; font-size: 0.85rem;">
+                    <%= @diary.raw_voice_text %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+
         </div>
 
         <%# カードのフッター：操作ボタン %>
@@ -75,15 +100,23 @@
           <% if @diary.review %>
             <p class="text-muted mb-2">この日記はすでにレビュー済みです。</p>
             <%= link_to "レビューを見る", review_path(@diary.review), class: "btn btn-outline-info" %>
+          
           <% else %>
-            <p class="fw-bold text-dark mb-2">この日記をもとに、AIと対話してレビューを作成しますか？</p>
-            <p class="small text-muted mb-3">対話しながら感情を深掘りし、魅力的なレビューに仕上げましょう！</p>
+            <p class="fw-bold text-dark mb-2">この日記の中から、特定の出来事を選んでレビューを作成しますか？</p>
+            <p class="small text-muted mb-3">（例：「APEX」「駅前のカフェ」など、レビューしたい対象を入力してください）</p>
             
-            <%# ここも data: { turbo_method: :post } で直接チャット画面へ！ %>
-            <%= link_to ai_interviews_path(diary_id: @diary.id), data: { turbo_method: :post }, class: "btn btn-success fw-bold text-white px-4 shadow-sm rounded-pill" do %>
-              <i class="fas fa-magic me-1"></i> AIインタビューを開始する 💬✨
+            <%# 💡 変更：単なるボタンから、対象を入力するフォームに変更！ %>
+            <%= form_with url: ai_interviews_path, local: true, method: :post, class: "d-flex flex-column align-items-center" do |f| %>
+              <%= f.hidden_field :diary_id, value: @diary.id %>
+              <div class="mb-3 w-100" style="max-width: 400px;">
+                <%= f.text_field :review_target, class: "form-control text-center border-success", placeholder: "例：カフェ、映画、 など", required: true %>
+              </div>
+              <%= f.button class: "btn btn-success fw-bold text-white px-4 shadow-sm rounded-pill" do %>
+                <i class="fas fa-magic me-1"></i> 対象を絞ってAIインタビューを開始 💬✨
+              <% end %>
             <% end %>
           <% end %>
+
         </div>
       </div>
 

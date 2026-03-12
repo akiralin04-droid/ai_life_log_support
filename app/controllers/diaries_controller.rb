@@ -33,14 +33,44 @@ class DiariesController < ApplicationController
   def create
     @diary = current_user.diaries.build(diary_params)
 
-    # ▼▼▼ AI機能の実装 ▼▼▼
-    if @diary.content.present?
-      ai_response = AiSummaryService.new(@diary.content).call
-      @diary.ai_response = ai_response
-    end
-
+    # 日記を保存（この時点では content は空っぽですが保存します）
     if @diary.save
-      redirect_to @diary, notice: "日記を保存しました！（AI分析は準備中です）"
+      # チャットルームを作成（日記のIDを紐づける・目的に「日記作成」を指定）
+      @ai_interview = current_user.ai_interviews.create!(diary_id: @diary.id, purpose: :diary_creation)
+      
+      # OpenAI APIを使って具体的な質問を生成します
+      client = OpenAI::Client.new(access_token: ENV['OPENAI_ACCESS_TOKEN'])
+      
+      prompt = <<~TEXT
+        あなたはプロのインタビュアー兼カウンセラーです。ユーザーの以下の「今日の予定」を見て、
+        一日の振り返りとして深掘りするための具体的な質問を2〜3個作成してください。
+        親しみやすいトーンで、ユーザーが音声で一気に答えやすいように優しく問いかけてください。
+        
+        【今日の予定】
+        #{@diary.schedule}
+      TEXT
+
+      begin
+        response = client.chat(
+          parameters: {
+            model: "gpt-3.5-turbo",
+            messages:[{ role: "user", content: prompt }],
+            temperature: 0.7
+          }
+        )
+        ai_question = response.dig("choices", 0, "message", "content")
+      rescue => e
+        Rails.logger.error "OpenAI API Error: #{e.message}"
+        # エラー時の保険（フェイルセーフ）
+        ai_question = "今日もお疲れ様です！スケジュールについて、一番印象に残っている出来事や、心が動いた瞬間について、マイクボタンを使って自由に話してみてください！🎙️"
+      end
+      
+      # AIの第一声として保存
+      @ai_interview.ai_messages.create!(role: :assistant, content: ai_question)
+
+      # 作成したチャット画面へリダイレクト
+      redirect_to ai_interview_path(@ai_interview), notice: "AIがスケジュールを分析し、質問を作成しました！✨"
+      
     else
       render :new, status: :unprocessable_entity
     end
@@ -91,7 +121,7 @@ class DiariesController < ApplicationController
 
   # ストロングパラメータ（セキュリティ）
   def diary_params
-    params.require(:diary).permit(:content, :is_published)
+    params.require(:diary).permit(:content, :is_published, :schedule, :raw_voice_text)
   end
 
   # ▼▼▼ 追加: 本人確認メソッド ▼▼▼
