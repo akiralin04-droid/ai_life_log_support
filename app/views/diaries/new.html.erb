@@ -1,62 +1,36 @@
-<%# 画面の中央に配置 %>
-<div class="container py-5"> <%# 上下に余白を追加 %>
+<div class="container py-5">
   <div class="row justify-content-center">
     <div class="col-md-8">
       
-      <%# タイトル %>
-      <div class="text-center mb-5"> <%# 下に余白を追加 %>
+      <div class="text-center mb-5">
         <h2 class="fw-bold">今日の日記を書く</h2>
         <p class="text-muted">
-          AIがあなたの記録をサポートします。<br>
-          今日あったこと、感じたことを自由に書いてください。
+          まずは今日のスケジュールや出来事を簡単に教えてください。<br>
+          AIがそれを読み込み、あなたにぴったりの質問を投げかけます！
         </p>
       </div>
 
-      <%# エラーメッセージ表示エリア %>
-      <% if @diary.errors.any? %>
-        <div class="alert alert-danger">
-          <ul class="mb-0">
-            <% @diary.errors.full_messages.each do |message| %>
-              <li><%= message %></li>
-            <% end %>
-          </ul>
-        </div>
-      <% end %>
-
-      <%# 入力フォーム %>
-      <div class="card shadow-sm border-0"> <%# 枠線を消して影をつけるデザインに変更 %>
-        <div class="card-body p-4"> <%# 内側の余白を広げる %>
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
           
           <%= form_with model: @diary, local: true do |f| %>
             
-            <%# 日記本文の入力欄 %>
             <div class="mb-4">
-              <%= f.label :content, "今の気持ちや出来事", class: "form-label fw-bold" %>
-              <%# チャットボックスっぽく高さを確保 %>
-              <%# bg-light で入力欄の背景を少しグレーにして見やすく %>
-              <%= f.text_area :content, rows: 10, class: "form-control bg-light", placeholder: "例：今日は新しいカフェに行ってみた。コーヒーが美味しくて、読書が捗った..." %>
+              <%= f.label :schedule, "📅 今日の予定・出来事（箇条書きでOK！）", class: "form-label fw-bold" %>
+              <%# 最初から「朝・昼・夕方・夜」の文字を入れておく %>
+              <%= f.text_area :schedule, rows: 6, class: "form-control bg-light", value: @diary.schedule || "朝：\n昼：\n夕方：\n夜：" %>
             </div>
 
-            <%# 公開設定（トグルスイッチ風） %>
-            <%# p-3 border rounded で囲んで目立たせる %>
-            <div class="mb-4 form-check form-switch p-3 border rounded bg-light ms-0">
-              <div class="ms-4"> <%# スイッチの位置調整 %>
-                <%= f.check_box :is_published, class: "form-check-input", id: "publishSwitch" %>
-                <%= f.label :is_published, "この日記を公開する（他の人に見せる）", class: "form-check-label fw-bold", for: "publishSwitch" %>
-                <div class="form-text text-muted small">公開すると、みんなのレビュー一覧に表示される可能性があります。</div>
-              </div>
-            </div>
+            <%# 日記本文(content)は、この後AIが自動で書くため、ここでは隠しフィールド(空)にしておきます %>
+            <%= f.hidden_field :content, value: "" %>
 
-            <%# 送信ボタン %>
             <div class="d-grid gap-2">
-              <%= f.submit "保存する", class: "btn btn-primary btn-lg fw-bold" %>
-              
-              <%# ▼▼▼ 修正箇所: 戻るリンク先を変更 ▼▼▼ %>
-              <%# user_path(current_user) から mypage_path に変更しました %>
-              <%# デザインもボタン風(btn-outline-secondary)に変更 %>
+              <%= f.submit "AIに深掘りしてもらう ✨", class: "btn btn-primary btn-lg fw-bold" %>
               <%= link_to "キャンセルして戻る", mypage_path, class: "btn btn-outline-secondary" %>
             </div>
+            
           <% end %>
+
         </div>
       </div>
 
