@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_12_103657) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_18_043845) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -94,7 +94,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_12_103657) do
     t.datetime "updated_at", null: false
     t.text "schedule"
     t.text "raw_voice_text"
+    t.integer "weekly_report_id"
     t.index ["user_id"], name: "index_diaries_on_user_id"
+    t.index ["weekly_report_id"], name: "index_diaries_on_weekly_report_id"
   end
 
   create_table "favorites", force: :cascade do |t|
@@ -265,6 +267,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_12_103657) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  create_table "weekly_reports", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.date "start_date"
+    t.date "end_date"
+    t.text "content"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_weekly_reports_on_user_id"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "ai_interviews", "campaigns"
@@ -275,6 +287,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_12_103657) do
   add_foreign_key "comments", "reviews"
   add_foreign_key "comments", "users"
   add_foreign_key "diaries", "users"
+  add_foreign_key "diaries", "weekly_reports"
   add_foreign_key "favorites", "reviews"
   add_foreign_key "favorites", "users"
   add_foreign_key "review_tags", "reviews"
@@ -288,4 +301,5 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_12_103657) do
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "weekly_reports", "users"
 end
