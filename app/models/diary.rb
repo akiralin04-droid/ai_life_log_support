@@ -1,5 +1,7 @@
 class Diary < ApplicationRecord
   belongs_to :user
+  belongs_to :weekly_report, optional: true
+  
   has_one :review # 日記から生まれるレビューは1つ
 
   # Ransack用の検索・並び替え許可リスト

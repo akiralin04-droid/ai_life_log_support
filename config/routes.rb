@@ -19,9 +19,10 @@ Rails.application.routes.draw do
   # ユーザー機能
   resources :users, only: [:index, :show, :edit, :update]
 
-  # マイページ (showのみ)
+  # マイページ 
   resource :mypage, only: [:show]
-
+  resources :weekly_reports, only:[:show, :create, :destroy]
+  
   # 日記機能
   resources :diaries do
     # ▼▼▼ 追加: コレクションルーティング ▼▼▼
