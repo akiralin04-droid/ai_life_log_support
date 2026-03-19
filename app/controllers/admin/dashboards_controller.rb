@@ -8,6 +8,25 @@ class Admin::DashboardsController < ApplicationController
     @diary_count = Diary.count
     @review_count = Review.count
     @campaign_count = Campaign.count
+
+    # 感情スコアのギャップが大きいレビュー（AI評価 vs 自己評価）上位5件
+    # MySQLのABS関数で絶対値（差分）を計算し、ギャップが大きい順に取得
+    @gap_reviews = Review.where.not(emotion_score: nil)
+                         .where.not(user_emotion_score: nil)
+                         .order(Arel.sql('ABS(emotion_score - user_emotion_score) DESC'))
+                         .limit(5)
+                         .includes(:user, :diary)
+
+    # アクティブなキャンペーン（直近の5件）と、それに紐づく利用状況
+    @active_campaigns = Campaign.where(is_active: true)
+                                .includes(:reviews, :ai_interviews)
+                                .order(created_at: :desc)
+                                .limit(5)
+
+    # 最新のAI対話履歴（AIインタビュー）上位5件
+    @recent_ai_interviews = AiInterview.includes(:user, :diary, :campaign)
+                                       .order(created_at: :desc)
+                                       .limit(5)
     
   end
 
