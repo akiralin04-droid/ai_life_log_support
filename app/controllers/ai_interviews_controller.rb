@@ -168,7 +168,13 @@ class AiInterviewsController < ApplicationController
       end
 
       # 日記が完成したので、ここでAI分析レポートも作って一緒に保存する！
-      ai_response = AiSummaryService.new(ai_diary_content).call
+      # AI分析でエラーが起きても、日記本文と音声データだけは確実に保存するフェイルセーフ！
+      begin
+        ai_response = AiSummaryService.new(ai_diary_content).call
+      rescue => e
+        Rails.logger.error "AiSummaryService Error: #{e.message}"
+        ai_response = "（現在AIが混雑しており、分析レポートの生成にタイムアウトしました。後ほど編集画面からお試しください）"
+      end
 
       @ai_interview.diary.update!(
         content: ai_diary_content,
@@ -185,7 +191,20 @@ class AiInterviewsController < ApplicationController
       # 📝 レビューモード：既存のレビュー生成処理（そのまま）
       # =========================================================
       campaign_prompt = @ai_interview.campaign&.ai_prompt
-      ai_result = AiReviewGenerationService.new(conversation_history, "", campaign_prompt: campaign_prompt).call
+
+      # AIの生成がタイムアウトしても、ユーザーの「会話履歴（音声データ）」を本文に直接入れて絶対に守る！
+      begin
+        ai_result = AiReviewGenerationService.new(conversation_history, "", campaign_prompt: campaign_prompt).call
+      rescue => e
+        Rails.logger.error "AiReviewGenerationService Error: #{e.message}"
+        ai_result = {
+          "title" => "【AI生成エラー】手動で編集してください",
+          "body" => "（※AIの処理がタイムアウトしました。以下の生データをもとにレビューを作成してください）\n\n#{conversation_history}",
+          "emotion_score" => 0.0,
+          "rating" => 3,
+          "category" => 0
+        }
+      end
 
       @review = Review.new(
         title: ai_result["title"],
@@ -198,8 +217,11 @@ class AiInterviewsController < ApplicationController
       )
 
       @ai_interview.update(status: :completed)
+
+       # エラー時であっても入力画面は表示され、ユーザーは会話履歴からコピペして手動でレビューを完成できる
       render "reviews/new", status: :unprocessable_entity
     end
+    
   end
 
 end
