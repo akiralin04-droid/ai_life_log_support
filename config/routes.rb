@@ -67,4 +67,7 @@ Rails.application.routes.draw do
     resources :campaigns
   end
 
+  # オンボーディング完了用のルーティング（更新のみ）
+  resource :onboarding, only: [:update]
+
 end

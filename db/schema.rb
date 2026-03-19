@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_18_043845) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_19_031559) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -264,6 +264,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_18_043845) do
     t.text "introduction"
     t.integer "role", default: 0, null: false
     t.boolean "is_active", default: true, null: false
+    t.boolean "onboarding_completed", default: false, null: false
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
