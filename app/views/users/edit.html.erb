@@ -55,13 +55,23 @@
               <div class="form-text">200文字以内で入力してください。</div>
             </div>
 
+            <%# カスタムフォーマット (AIアシスタントへの指示) %>
+            <div class="mb-5 p-4 rounded bg-light border border-primary border-opacity-25 shadow-sm">
+              <%= f.label :custom_format, "🤖 自分専用のAI日記フォーマット（カスタム指示）", class: "form-label fw-bold text-primary mb-2" %>
+              <p class="text-muted small mb-3">
+                AIに日記を作成・推敲させる際の「出力形式」や「口調」を自由に指定できます。<br>
+                空欄の場合は、標準のフォーマット（1日の流れ/良かったこと/改善点/気づき）で生成されます。
+              </p>
+              <%= f.text_area :custom_format, rows: 8, class: "form-control border-primary", placeholder: "例：\n以下の項目で出力してね！\n・今日のハイライト\n・新しく学んだこと\n・明日の目標\n\n※関西弁でフレンドリーに書いて！" %>
+            </div>
+
             <%# --- ボタンエリア --- %>
             <div class="d-grid gap-2">
               <%= f.submit "更新する", class: "btn btn-dark fw-bold" %>
               <%= link_to "マイページに戻る", mypage_path, class: "btn btn-outline-secondary" %>
             </div>
 
-            <%# ▼▼▼ 追加: 退会エリア ▼▼▼ %>
+            <%# 退会エリア %>
             <hr>
             <div class="text-center">
               <p class="text-muted small">アカウントを削除しますか？</p>

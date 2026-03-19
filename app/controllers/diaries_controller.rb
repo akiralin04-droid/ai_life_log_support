@@ -38,13 +38,30 @@ class DiariesController < ApplicationController
       # チャットルームを作成（日記のIDを紐づける・目的に「日記作成」を指定）
       @ai_interview = current_user.ai_interviews.create!(diary_id: @diary.id, purpose: :diary_creation)
       
+      #  声でそのまま日記化ルート（チャットをスキップ） 
+      if @diary.raw_voice_text.present?
+        # ユーザーの発言として保存
+        @ai_interview.ai_messages.create!(role: :user, content: @diary.raw_voice_text)
+        
+        # AiInterviewsControllerのfinalizeへ強制遷移させ、一発で日記本文と分析を生成させる！
+        redirect_to finalize_ai_interview_path(@ai_interview), notice: "音声データを送信しました。AIが日記を生成しています...✨"
+        return
+      end
+
       # OpenAI APIを使って具体的な質問を生成します
       client = OpenAI::Client.new(access_token: ENV['OPENAI_ACCESS_TOKEN'])
       
+      # ▼▼▼ 未来に活かせる気づき・反省を引き出すコーチングプロンプト ▼▼▼
       prompt = <<~TEXT
-        あなたはプロのインタビュアー兼カウンセラーです。ユーザーの以下の「今日の予定」を見て、
-        一日の振り返りとして深掘りするための具体的な質問を2〜3個作成してください。
-        親しみやすいトーンで、ユーザーが音声で一気に答えやすいように優しく問いかけてください。
+        あなたはユーザーの自己成長をサポートする優秀なライフコーチです。
+        ユーザーが入力した以下の「今日の予定」を読み込み、今日一日を深く振り返り、
+        未来に活かせる「気づき」や「反省点」を引き出すための質問を【1つだけ】作成してください。
+
+        【厳守事項】
+        1. 予定の中から具体的なキーワードを拾い、それに絡めて質問すること。
+        2. 単なる感想ではなく、「何がうまくいったか」「もっとどうすれば良かったか」「そこから何を学んだか」を考えさせるような、優しくも鋭い問いかけにすること。
+        3. ユーザーがマイクに向かって音声で答えやすいよう、親しみやすいトーンにすること。
+        4. 出力は質問の文章のみ（挨拶などは不要）としてください。
         
         【今日の予定】
         #{@diary.schedule}

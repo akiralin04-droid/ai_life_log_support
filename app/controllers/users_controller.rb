@@ -49,7 +49,7 @@ class UsersController < ApplicationController
 
   # Strong Parameters: 編集を許可する項目を指定
   def user_params
-    params.require(:user).permit(:name, :introduction, :profile_image)
+    params.require(:user).permit(:name, :introduction, :profile_image, :custom_format)
   end
 
   # 本人確認（URLのIDとログイン中のIDが違う場合は弾く）

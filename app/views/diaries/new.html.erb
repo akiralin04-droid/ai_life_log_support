@@ -5,28 +5,74 @@
       <div class="text-center mb-5">
         <h2 class="fw-bold">今日の日記を書く</h2>
         <p class="text-muted">
-          まずは今日のスケジュールや出来事を簡単に教えてください。<br>
-          AIがそれを読み込み、あなたにぴったりの質問を投げかけます！
+          その日の気分に合わせて、記録の方法を選べます。
         </p>
       </div>
 
       <div class="card shadow-sm border-0">
+        <div class="card-header bg-white p-0 border-bottom">
+          <ul class="nav nav-tabs nav-justified" id="diaryTab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active fw-bold py-3 text-danger" id="voice-tab" data-bs-toggle="tab" data-bs-target="#voice" type="button" role="tab" aria-controls="voice" aria-selected="true">
+                <i class="fas fa-microphone me-2"></i>声でそのまま日記化
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link fw-bold py-3 text-primary" id="schedule-tab" data-bs-toggle="tab" data-bs-target="#schedule" type="button" role="tab" aria-controls="schedule" aria-selected="false">
+                <i class="fas fa-calendar-alt me-2"></i>予定からAIに深掘り
+              </button>
+            </li>
+          </ul>
+        </div>
         <div class="card-body p-4">
           
           <%= form_with model: @diary, local: true do |f| %>
-            
-            <div class="mb-4">
-              <%= f.label :schedule, "📅 今日の予定・出来事（箇条書きでOK！）", class: "form-label fw-bold" %>
-              <%# 最初から「朝・昼・夕方・夜」の文字を入れておく %>
-              <%= f.text_area :schedule, rows: 6, class: "form-control bg-light", value: @diary.schedule || "朝：\n昼：\n夕方：\n夜：" %>
+            <div class="tab-content" id="diaryTabContent">
+              
+              <%# ============================================ %>
+              <%# タブ1：声でそのまま日記化（メイン機能） %>
+              <%# ============================================ %>
+              <div class="tab-pane fade show active" id="voice" role="tabpanel" aria-labelledby="voice-tab">
+                <div class="text-center mb-4">
+                  <p class="text-muted small">疲れている日はこれ！今日の出来事や感情を思いのままに話すだけで、AIが文脈を読み取り、綺麗な日記文章を自動作成します。</p>
+                </div>
+                <div class="mb-4">
+                  <%= f.label :raw_voice_text, "🎤 今日の出来事を話す", class: "form-label fw-bold" %>
+                  <div class="input-group mb-2">
+                    <button type="button" class="btn btn-outline-danger fw-bold" id="start-recording-btn">
+                      <i class="fas fa-microphone"></i> 音声入力
+                    </button>
+                  </div>
+                  <%= f.text_area :raw_voice_text, rows: 6, class: "form-control bg-light", id: "voice-input-area", placeholder: "マイクボタンを押して話すか、ここに入力してください..." %>
+                </div>
+                <div class="d-grid gap-2">
+                  <%= f.submit "AIに日記を作成してもらう ✨", class: "btn btn-danger btn-lg fw-bold" %>
+                </div>
+              </div>
+
+              <%# ============================================ %>
+              <%# タブ2：予定から深掘り（従来の機能） %>
+              <%# ============================================ %>
+              <div class="tab-pane fade" id="schedule" role="tabpanel" aria-labelledby="schedule-tab">
+                <div class="text-center mb-4">
+                  <p class="text-muted small">箇条書きで予定を入力すると、AIが「今日の一番のハイライト」を引き出すためのインタビューをしてくれます。</p>
+                </div>
+                <div class="mb-4">
+                  <%= f.label :schedule, "📅 今日の予定・出来事（箇条書きでOK！）", class: "form-label fw-bold" %>
+                  <%= f.text_area :schedule, rows: 6, class: "form-control bg-light", value: @diary.schedule || "朝：\n昼：\n夕方：\n夜：" %>
+                </div>
+                <div class="d-grid gap-2">
+                  <%= f.submit "AIとチャットしながら日記を作る ✨", class: "btn btn-primary btn-lg fw-bold" %>
+                </div>
+              </div>
+
             </div>
 
-            <%# 日記本文(content)は、この後AIが自動で書くため、ここでは隠しフィールド(空)にしておきます %>
+            <%# 日記本文(content)はAIが自動で書くため隠しフィールド %>
             <%= f.hidden_field :content, value: "" %>
 
-            <div class="d-grid gap-2">
-              <%= f.submit "AIに深掘りしてもらう ✨", class: "btn btn-primary btn-lg fw-bold" %>
-              <%= link_to "キャンセルして戻る", mypage_path, class: "btn btn-outline-secondary" %>
+            <div class="text-center mt-4">
+              <%= link_to "キャンセルして戻る", mypage_path, class: "text-muted small text-decoration-none" %>
             </div>
             
           <% end %>
@@ -37,3 +83,57 @@
     </div>
   </div>
 </div>
+
+<%# Web Speech APIによる音声入力のJavaScript %>
+<script>
+  document.addEventListener("turbo:load", () => {
+    const startBtn = document.getElementById("start-recording-btn");
+    const textArea = document.getElementById("voice-input-area");
+    
+    if (startBtn && textArea) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (typeof SpeechRecognition === "undefined") {
+        startBtn.style.display = "none";
+        return;
+      }
+      
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'ja-JP';
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      let isRecording = false;
+
+      startBtn.addEventListener("click", () => {
+        if (isRecording) {
+          recognition.stop();
+          startBtn.classList.remove("btn-danger", "text-white");
+          startBtn.classList.add("btn-outline-danger");
+          startBtn.innerHTML = '<i class="fas fa-microphone"></i> 音声入力';
+        } else {
+          recognition.start();
+          startBtn.classList.remove("btn-outline-danger");
+          startBtn.classList.add("btn-danger", "text-white");
+          startBtn.innerHTML = '<i class="fas fa-stop-circle"></i> 録音中 (クリックで停止)';
+        }
+        isRecording = !isRecording;
+      });
+
+      recognition.onresult = (event) => {
+        let finalTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          }
+        }
+        if (finalTranscript !== '') {
+          textArea.value += finalTranscript + " ";
+        }
+      };
+      
+      recognition.onerror = (event) => {
+        console.error("音声認識エラー:", event.error);
+        if (isRecording) startBtn.click();
+      };
+    }
+  });
+</script>
