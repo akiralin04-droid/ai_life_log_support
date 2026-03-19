@@ -1,37 +1,70 @@
-<div class="container py-5 text-center">
-  <h1 class="fw-bold mb-4">AI Life Log Support とは</h1>
-  <p class="lead text-muted mb-5">
-    日々の出来事を記録し、AIがあなたの感情や行動を分析。<br>
-    新しい気づきと、共有できるレビューを生み出すライフログアプリです。
-  </p>
+<div class="container py-5">
+  <div class="text-center mb-5">
+    <span class="badge bg-primary px-3 py-2 rounded-pill mb-3">Progressive Web App 対応</span>
+    <h1 class="fw-bold display-5 mb-4">声で綴る、AIが育てる。<br>新しいライフログ体験。</h1>
+    <p class="lead text-muted col-md-8 mx-auto">
+      AI Life Log Support は、あなたの何気ない日常のつぶやきを、価値ある「レビュー」へと昇華させる次世代のプラットフォームです。<br>
+      最新のAI技術と音声認識を駆使し、記録の負担をゼロにします。
+    </p>
+  </div>
   
-  <div class="row justify-content-center g-4">
-    <div class="col-md-4">
-      <div class="card h-100 shadow-sm border-0">
-        <div class="card-body p-4">
-          <i class="fas fa-book fa-3x text-primary mb-3"></i>
-          <h5 class="fw-bold">日記を書く</h5>
-          <p class="text-muted small">今日の出来事や気持ちを自由に記録しましょう。</p>
-        </div>
+  <div class="row g-5 my-5">
+    <%# アピールポイント1：音声入力と無限推敲 %>
+    <div class="col-md-6 d-flex align-items-center">
+      <div>
+        <div class="mb-3"><i class="fas fa-microphone-alt fa-3x text-danger"></i></div>
+        <h3 class="fw-bold">1. マイクに向かって話すだけ</h3>
+        <p class="text-muted">
+          Web Speech APIを搭載。タイピングは不要です。帰り道にスマホに向かって今日の出来事を話しかけるだけで、AIが文脈を理解し、綺麗な文章に整えます。さらに「もっとここを直して」という無限推敲ループにも対応しています。
+        </p>
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="card h-100 shadow-sm border-0">
-        <div class="card-body p-4">
-          <i class="fas fa-robot fa-3x text-success mb-3"></i>
-          <h5 class="fw-bold">AI分析 & レビュー</h5>
-          <p class="text-muted small">AIが日記を分析し、素敵なレビュー記事を自動生成します。</p>
-        </div>
+    <div class="col-md-6">
+      <div class="p-4 bg-light rounded-4 border h-100 d-flex flex-column justify-content-center text-center">
+        <h5 class="fw-bold text-dark">「映画のラストがすごくて…」</h5>
+        <i class="fas fa-arrow-down text-muted my-2"></i>
+        <h5 class="fw-bold text-primary">AI:「その時の感情をもう少し詳しく教えてもらえますか？」</h5>
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="card h-100 shadow-sm border-0">
-        <div class="card-body p-4">
-          <i class="fas fa-users fa-3x text-warning mb-3"></i>
-          <h5 class="fw-bold">みんなと共有</h5>
-          <p class="text-muted small">生成されたレビューを公開して、他のユーザーと共有できます。</p>
-        </div>
+
+    <%# アピールポイント2：インサイトと感情分析 %>
+    <div class="col-md-6 order-md-2 d-flex align-items-center">
+      <div>
+        <div class="mb-3"><i class="fas fa-brain fa-3x text-info"></i></div>
+        <h3 class="fw-bold">2. AIがあなたの心を分析</h3>
+        <p class="text-muted">
+          蓄積された日記データから、ユーザーの感情スコアをAIが独自に分析。ユーザー自身の自己評価との「ギャップ」を可視化することで、自分でも気づかなかった深層心理やインサイト（新しい発見）を提供します。
+        </p>
       </div>
     </div>
+    <div class="col-md-6 order-md-1">
+      <div class="p-4 bg-light rounded-4 border h-100 d-flex flex-column justify-content-center text-center">
+        <h5 class="text-dark">自己評価：<span class="badge bg-primary">3.0</span></h5>
+        <i class="fas fa-arrow-down text-muted my-2"></i>
+        <h5 class="text-info fw-bold">AI評価スコア：<span class="badge bg-info text-dark">4.5</span></h5>
+        <p class="small text-danger mt-2">ギャップ: +1.5 (無意識のポジティブな感情を検知！)</p>
+      </div>
+    </div>
+
+    <%# アピールポイント3：企業のキャンペーン連携 %>
+    <div class="col-md-6 d-flex align-items-center">
+      <div>
+        <div class="mb-3"><i class="fas fa-bullhorn fa-3x text-warning"></i></div>
+        <h3 class="fw-bold">3. 日常の記録が価値に変わる</h3>
+        <p class="text-muted">
+          企業が主催するキャンペーンに紐づけて日記を書くことで、AIが企業の求めるポイント（味、使い心地など）を自然にインタビュー。ユーザーの手間なく、質の高いマーケティングデータとレビューを生み出します。
+        </p>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="p-4 bg-light rounded-4 border h-100 d-flex flex-column justify-content-center text-center">
+        <i class="fas fa-gift fa-3x text-warning mb-3"></i>
+        <h5 class="fw-bold text-dark">レビューを投稿して、<br>特別な体験をシェアしよう</h5>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center mt-5">
+    <%= link_to "トップページへ戻る", root_path, class: "btn btn-outline-secondary rounded-pill px-5 fw-bold" %>
   </div>
 </div>
