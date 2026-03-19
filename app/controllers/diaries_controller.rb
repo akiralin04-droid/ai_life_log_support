@@ -2,15 +2,15 @@
 class DiariesController < ApplicationController
 
   # ログインしていないと日記は見れないようにする（ApplicationControllerの設定を引き継ぐ）
-  # ▼▼▼ 追加: 編集・更新・削除の前に、権限チェックを行う ▼▼▼
+  # 編集・更新・削除の前に、権限チェックを行う 
   # これにより、アクションの中で個別にデータ取得を書く必要がなくなります
   before_action :ensure_correct_user, only: [:edit, :update, :destroy]
-  # ▲▲▲ 追加ここまで ▲▲▲
 
   # 日記の一覧画面 (GET /diaries)
   def index
     # ログインしているユーザーの日記だけを、新しい順に取得する
-    @diaries = current_user.diaries.order(created_at: :desc)
+    # 【N+1対策】一覧で「レビュー済みか」等の判定を行うため、review を一緒に取得！
+    @diaries = current_user.diaries.includes(:review).order(created_at: :desc)
   end
 
   # 日記の詳細画面 (GET /diaries/:id)
@@ -124,7 +124,7 @@ class DiariesController < ApplicationController
     params.require(:diary).permit(:content, :is_published, :schedule, :raw_voice_text)
   end
 
-  # ▼▼▼ 追加: 本人確認メソッド ▼▼▼
+  # 本人確認メソッド 
   def ensure_correct_user
     # find(params[:id]) だと見つからない時にエラー(404)になりますが、
     # find_by(id: params[:id]) だとエラーにならず nil が返ります。
@@ -136,5 +136,5 @@ class DiariesController < ApplicationController
       redirect_to diaries_path, alert: "権限がありません。"
     end
   end
-  # ▲▲▲ 追加ここまで ▲▲▲
+
 end
