@@ -74,4 +74,8 @@ Rails.application.routes.draw do
   # オンボーディング完了用のルーティング（更新のみ）
   resource :onboarding, only: [:update]
 
+  # PWA対応 (Rails 8 標準機能)
+  get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
+  get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
+
 end
