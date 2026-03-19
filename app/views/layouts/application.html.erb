@@ -7,6 +7,24 @@
     <!-- スマホで見た時に文字が小さくならないようにする設定 -->
     <meta name="viewport" content="width=device-width,initial-scale=1">
     
+    
+    <!-- OGP（SNSシェア用のリッチカード）設定 -->
+    <meta property="og:site_name" content="AI Life Log Support">
+    <meta property="og:title" content="AI Life Log Support | 声で綴る、AIが育てる新しい日記体験">
+    <meta property="og:description" content="日々の記録から価値ある「レビュー」を生成。音声入力とAIとの対話で、あなたの感情や思考を深掘りするライフログアプリです。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<%= request.original_url %>">
+    
+    <!-- ※OGP画像：とりあえずアプリ名が入ったダミーの青い画像を設定しています。 -->
+    <!-- 後で「1200x630px」の画像を作成し、ここを本物の画像のURLに差し替えると完璧です！ -->
+    <meta property="og:image" content="https://dummyimage.com/1200x630/0d6efd/ffffff.png&text=AI+Life+Log+Support">
+    
+    <!-- X (旧Twitter) やSlackなどで、大きな画像カードとして表示させる設定 -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AI Life Log Support">
+    <meta name="twitter:description" content="AIがあなたの「日記」を分析し、共有できる「レビュー」を生成します。">
+
+
     <!-- Railsのセキュリティ対策（偽サイトからの攻撃を防ぐ） -->
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
