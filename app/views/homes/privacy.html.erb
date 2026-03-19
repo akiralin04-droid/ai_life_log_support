@@ -1,0 +1,54 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-9 col-md-11">
+
+      <div class="text-center mb-5">
+        <h2 class="fw-bold"><i class="fas fa-shield-alt text-success me-2"></i>プライバシーポリシー</h2>
+        <p class="text-muted mt-2">最終更新日: <%= Time.current.strftime("%Y年%m月%d日") %></p>
+      </div>
+
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-4 p-md-5 text-dark" style="line-height: 1.8;">
+
+          <p class="mb-5">
+            AI Life Log Support（以下、「本サービス」といいます。）は、ユーザーの皆さまの個人情報およびプライバシーの保護を最重要視しています。本ポリシーは、本サービスが収集する情報の種類、利用目的、およびその取り扱いについて説明するものです。
+          </p>
+
+          <h5 class="fw-bold mt-4 border-bottom pb-2 text-success">1. 取得する情報</h5>
+          <p class="mb-4">
+            本サービスでは、アカウント登録およびサービスの提供にあたり、以下の情報を取得します。<br>
+            ・登録情報：メールアドレス、表示名、プロフィール画像<br>
+            ・入力データ：テキスト入力された日記、Web Speech APIを通じて音声入力されテキスト化されたデータ、AIとの対話履歴<br>
+            ・利用履歴：本サービスの機能（キャンペーン参加、レビュー投稿など）の利用状況
+          </p>
+
+          <h5 class="fw-bold mt-4 border-bottom pb-2 text-success">2. 情報の利用目的</h5>
+          <p class="mb-4">
+            取得した情報は、以下の目的で利用されます。<br>
+            ・本サービスのコア機能である「AIによる日記の分析・推敲・感情スコアの算出・レビュー生成」を提供するため<br>
+            ・ユーザーの認証、およびアカウント管理のため<br>
+            ・キャンペーン機能における、参加状況の管理および企業向け統計データ（個人を特定できないよう匿名化された状態）の作成のため
+          </p>
+
+          <h5 class="fw-bold mt-4 border-bottom pb-2 text-success">3. AIモデルへのデータ送信について</h5>
+          <p class="mb-4">
+            本サービスは、高度な自然言語処理を行うため、ユーザーの入力テキスト（音声から変換されたテキストを含む）を外部のAI APIに送信します。<br>
+            送信されるデータは機能の提供目的でのみ処理され、API提供元のAIモデルの学習データとして無断で利用されることはありません。
+          </p>
+
+          <h5 class="fw-bold mt-4 border-bottom pb-2 text-success">4. 第三者提供および免責事項</h5>
+          <p class="mb-4">
+            1. 本サービスは、ユーザー本人の同意がある場合、または法令に基づく場合を除き、取得した個人情報を第三者に提供することはありません。<br>
+            2. 本サービスはエンジニアのポートフォリオとして開発されたWebアプリケーションです。細心の注意を払ってデータ管理を行いますが、予期せぬシステムトラブルによるデータの消失や漏洩について、完全な保証はできかねますことをあらかじめご了承ください。
+          </p>
+
+          <div class="text-center mt-5">
+            <%= link_to "トップページへ戻る", root_path, class: "btn btn-outline-secondary rounded-pill px-5 fw-bold" %>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

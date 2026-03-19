@@ -3,6 +3,10 @@ Rails.application.routes.draw do
   root to: "homes#top"
   get "home/about" => "homes#about", as: "about"
 
+  # 利用規約 & プライバシーポリシー
+  get "home/terms" => "homes#terms", as: "terms"
+  get "home/privacy" => "homes#privacy", as: "privacy"
+
   # 検索
   get "search" => "searches#search"
 
