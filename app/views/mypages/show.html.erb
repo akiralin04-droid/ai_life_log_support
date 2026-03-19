@@ -32,6 +32,14 @@
             <%= simple_format(@user.introduction.presence || "自己紹介文はまだ設定されていません。") %>
           </p>
 
+          <%# カスタムフォーマット確認パネル %>
+          <% if @user.custom_format.present? %>
+            <div class="alert alert-primary bg-primary bg-opacity-10 border-primary border-opacity-25 p-3 mb-4 text-start small shadow-sm">
+              <h6 class="fw-bold text-primary mb-2"><i class="fas fa-robot me-1"></i> My AIフォーマット（有効）</h6>
+              <div style="white-space: pre-wrap; font-family: monospace; color: #333;"><%= @user.custom_format %></div>
+            </div>
+          <% end %>
+
           <%# 統計バッジ %>
           <div class="d-flex gap-3 justify-content-center justify-content-md-start mb-3">
             <div class="border rounded px-3 py-1 bg-light text-center">
@@ -63,6 +71,159 @@
     </div>
   </div>
 
+  <%# アクティビティ＆ウィークリー分析エリア %>
+  <div class="row mb-5">
+    
+    <%# 📅 左側：月間カレンダー（アクティビティ） %>
+    <div class="col-lg-7 mb-4 mb-lg-0">
+      <div class="card shadow-sm h-100 border-0">
+        <div class="card-body p-4">
+          
+          <%# カレンダーのヘッダー（先月・翌月の切り替え） %>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0"><i class="far fa-calendar-alt text-success me-2"></i> カレンダー</h5>
+            
+            <div class="d-flex align-items-center gap-3">
+              <%# 先月へ戻るボタン %>
+              <%= link_to mypage_path(month: @current_month.prev_month.strftime('%Y-%m')), class: "btn btn-outline-secondary btn-sm" do %>
+                <i class="fas fa-chevron-left"></i>
+              <% end %>
+              
+              <span class="fw-bold text-dark fs-5"><%= @current_month.strftime('%Y年 %m月') %></span>
+              
+              <%# 翌月へ進むボタン %>
+              <%= link_to mypage_path(month: @current_month.next_month.strftime('%Y-%m')), class: "btn btn-outline-secondary btn-sm" do %>
+                <i class="fas fa-chevron-right"></i>
+              <% end %>
+            </div>
+          </div>
+
+          <%# 📅 カレンダー本体（テーブル） %>
+          <div class="table-responsive">
+            <table class="table table-bordered text-center mb-0" style="table-layout: fixed;">
+              <thead class="bg-light">
+                <tr>
+                  <th class="text-danger py-2"><small>日</small></th>
+                  <th class="py-2"><small>月</small></th>
+                  <th class="py-2"><small>火</small></th>
+                  <th class="py-2"><small>水</small></th>
+                  <th class="py-2"><small>木</small></th>
+                  <th class="py-2"><small>金</small></th>
+                  <th class="text-primary py-2"><small>土</small></th>
+                </tr>
+              </thead>
+              <tbody>
+                <%# @start_date から @end_date までの日付を7日（1週間）ごとに区切って行を作る %>
+                <% (@start_date..@end_date).to_a.each_slice(7) do |week| %>
+                  <tr>
+                    <% week.each do |date| %>
+                      <% 
+                        # 表示設定のための判定
+                        is_current_month = date.month == @current_month.month
+                        is_today = date == Date.today
+  
+                        day_diaries = @diaries_by_date[date]
+                        has_diary = day_diaries.present?
+                        count = has_diary ? day_diaries.size : 0
+
+                        # 未分析の日記があるかチェック（すべて分析済みなら水色にする）
+                        unused_count = has_diary ? day_diaries.count { |d| d.weekly_report_id.nil? } : 0
+                        is_all_analyzed = has_diary && unused_count == 0
+                        
+                        # 背景色とボタン色の切り替え
+                        bg_color_class = is_all_analyzed ? 'bg-info' : 'bg-success'
+                        btn_color_class = is_all_analyzed ? 'btn-info text-white' : 'btn-success'
+                      %>
+
+                      <%# 日記がある日は背景を薄い緑色にする %>
+                      <td class="p-1 <%= 'bg-success bg-opacity-10' if has_diary %>" style="height: 70px; vertical-align: top;">
+                        <div class="d-flex flex-column h-100">
+                          
+                          <%# 日付の数字 %>
+                          <div class="text-end mb-1">
+                            <span class="small <%= 'text-muted opacity-50' unless is_current_month %> <%= 'bg-primary text-white rounded-circle d-inline-block text-center' if is_today %>" style="width: 20px; height: 20px; line-height: 20px;">
+                              <%= date.day %>
+                            </span>
+                          </div>
+
+                          <%# 日記があればドロップダウンを表示 %>
+                          <div class="mt-auto mb-1 text-center dropdown">
+                            <% if has_diary %>
+                              <button class="btn <%= btn_color_class %> btn-sm rounded-pill shadow-sm p-0 px-2 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.75rem;">
+                                <i class="fas <%= is_all_analyzed ? 'fa-check-circle' : 'fa-pen' %> fa-xs"></i> <%= count %>件
+                              </button>
+                              
+                              <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="min-width: 200px; font-size: 0.85rem;">
+                                <li><h6 class="dropdown-header text-dark fw-bold"><%= date.strftime('%-m月%-d日') %> の記録</h6></li>
+                                <% day_diaries.each do |diary| %>
+                                  <li>
+                                    <% preview_text = diary.schedule.presence || diary.content.presence || "記録あり" %>
+                                    <%# 💡 分析済みなら水色のチェック、未分析なら緑のペンアイコンを表示 %>
+                                    <% status_icon = diary.weekly_report_id.present? ? '<i class="fas fa-check-circle text-info me-1" title="分析済み"></i>' : '<i class="fas fa-pen text-success me-1" title="未分析"></i>' %>
+                                    <%= link_to diary_path(diary), data: { turbo_frame: "_top" }, class: "dropdown-item py-2 border-bottom text-wrap" do %>
+                                      <%= status_icon.html_safe %> <%= truncate(preview_text, length: 15) %>
+                                    <% end %>
+                                  </li>
+                                <% end %>
+                              </ul>
+                            <% end %>
+                          </div>
+                          
+                        </div>
+                      </td>
+                    <% end %>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <%# 🤖 右側：ウィークリー分析（AIインサイト） %>
+    <div class="col-lg-5">
+      <div class="card shadow-sm h-100 border-info border-opacity-25 <%= 'bg-info bg-opacity-10' unless @latest_weekly_report %>">
+        <div class="card-body p-4 d-flex flex-column <%= 'justify-content-center text-center' unless @latest_weekly_report %>">
+          
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="text-info-emphasis fw-bold mb-0"><i class="fas fa-chart-line me-2"></i> ウィークリーAI分析</h5>
+            <% if @latest_weekly_report %>
+              <span class="badge bg-info text-white shadow-sm"><%= @latest_weekly_report.start_date.strftime('%m/%d') %>〜<%= @latest_weekly_report.end_date.strftime('%m/%d') %></span>
+            <% end %>
+          </div>
+
+          <% if @latest_weekly_report %>
+            <%# 💡 レポート結果の表示（スクロールできるように高さを制限） %>
+            <div class="text-start text-dark mb-4 pe-2" style="font-size: 0.95rem; line-height: 1.7; max-height: 250px; overflow-y: auto;">
+              <%= simple_format(@latest_weekly_report.content) %>
+            </div>
+            
+            <div class="mt-auto text-end border-top pt-3">
+              <%# 削除して作り直すためのボタン %>
+              <%= link_to weekly_report_path(@latest_weekly_report), data: { turbo_method: :delete, turbo_confirm: "現在のレポートを削除して作り直しますか？" }, class: "btn btn-outline-danger btn-sm rounded-pill" do %>
+                <i class="fas fa-redo me-1"></i> 作り直す
+              <% end %>
+            </div>
+          <% else %>
+            <%# 💡 レポート作成前の表示 %>
+            <p class="text-muted small mb-4">
+              直近1週間（7日間）の記録と感情の動きをAIが分析し、あなたの成長やインサイトをレポートします。週末の振り返りに最適です！
+            </p>
+            
+            <%# コントローラーの create アクションにPOSTリクエストを送るボタン %>
+            <%= button_to weekly_reports_path, method: :post, class: "btn btn-info fw-bold text-white shadow-sm rounded-pill w-100 py-3", data: { disable_with: "AIが分析中..." } do %>
+              <i class="fas fa-magic me-2"></i> 今週の振り返りを作成する ✨
+            <% end %>
+          <% end %>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
   <%# --- 2. タブ切り替えコンテンツ --- %>
   
   <%# タブのヘッダー %>
@@ -82,6 +243,11 @@
         <i class="fas fa-heart text-danger"></i> いいね一覧
       </button>
     </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link fw-bold text-info" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab">
+        <i class="fas fa-chart-line"></i> 分析レポート履歴
+      </button>
+    </li>
   </ul>
 
   <%# タブの中身 %>
@@ -89,123 +255,198 @@
     
     <%# --- TAB 1: 日記履歴 --- %>
     <div class="tab-pane fade show active" id="diaries" role="tabpanel">
-      <% if @diaries.any? %>
-        <div class="list-group shadow-sm">
-          <% @diaries.each do |diary| %>
-            <div class="list-group-item list-group-item-action p-4">
-              <div class="d-flex w-100 justify-content-between align-items-center mb-2">
-                <h5 class="mb-1 fw-bold text-dark">
-                  <%= diary.created_at.strftime('%Y年%m月%d日') %> の日記
-                </h5>
-                <small class="text-muted"><%= time_ago_in_words(diary.created_at) %>前</small>
-              </div>
-              
-              <p class="mb-2 text-secondary"><%= truncate(diary.content, length: 80) %></p>
-              
-              <div class="d-flex justify-content-between align-items-center mt-3">
-                <div>
-                  <% if diary.review %>
-                    <span class="badge bg-success bg-opacity-10 text-success border border-success">
-                      <i class="fas fa-check"></i> 分析済み
-                    </span>
-                    <span class="ms-2 text-warning">
-                      <%= "★" * (diary.review.rating || 0) %>
-                    </span>
-                  <% else %>
-                    <span class="badge bg-secondary bg-opacity-10 text-secondary border">
-                      <i class="fas fa-spinner"></i> 分析待ち
-                    </span>
-                  <% end %>
+      <%# 🌟 魔法の箱（Turbo Frame）で囲む！この中での検索やページ切り替えは画面遷移しなくなります %>
+      <%= turbo_frame_tag "diaries_frame" do %>
+        <%# 🔍 日記の検索フォーム %>
+        <%= search_form_for @q_diaries, as: :q_diaries, url: mypage_path, class: "mb-3 d-flex gap-2" do |f| %>
+          <%= f.search_field :content_cont, class: "form-control bg-light", placeholder: "日記の内容で検索..." %>
+          <%= f.submit "検索", class: "btn btn-outline-secondary px-4" %>
+        <% end %>
+
+        <% if @diaries.any? %>
+          <div class="list-group shadow-sm">
+            <% @diaries.each do |diary| %>
+              <div class="list-group-item list-group-item-action p-4">
+                <div class="d-flex w-100 justify-content-between align-items-center mb-2">
+                  <h5 class="mb-1 fw-bold text-dark"><%= diary.created_at.strftime('%Y年%m月%d日') %></h5>
+                  <small class="text-muted"><%= time_ago_in_words(diary.created_at) %>前</small>
                 </div>
                 
-                <div class="btn-group">
-                  <%= link_to "詳細", diary_path(diary), class: "btn btn-sm btn-outline-primary" %>
-                  <%# 編集・削除ボタン %>
-                  <%#= link_to "編集", edit_diary_path(diary), class: "btn btn-sm btn-outline-secondary" %>
-                  <%#= link_to "削除", diary_path(diary), data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？" }, class: "btn btn-sm btn-outline-danger" %>
+                <p class="mb-3 text-secondary" style="white-space: pre-wrap;"><%= truncate(diary.content, length: 100) %></p>
+                
+                <div class="d-flex justify-content-between align-items-center border-top pt-3">
+                  <div>
+                    <% if diary.review %>
+                      <span class="badge bg-success bg-opacity-10 text-success border border-success me-2">
+                        <i class="fas fa-check"></i> レビュー作成済み
+                      </span>
+                      <%# 💡 外の画面へ飛ぶリンクには data: { turbo_frame: "_top" } を追加して脱出させます！ %>
+                      <%= link_to "レビューを見る", review_path(diary.review), data: { turbo_frame: "_top" }, class: "btn btn-sm btn-outline-success" %>
+                    <% else %>
+                      <span class="badge bg-secondary bg-opacity-10 text-secondary border me-2">
+                        <i class="fas fa-pen"></i> レビュー未作成
+                      </span>
+                      <%= link_to ai_interviews_path(diary_id: diary.id), data: { turbo_method: :post, turbo_frame: "_top" }, class: "btn btn-sm btn-primary" do %>
+                        <i class="fas fa-magic me-1"></i> AIとレビューを作る ✨
+                      <% end %>
+                    <% end %>
+                  </div>
+                  
+                  <%= link_to "詳細", diary_path(diary), data: { turbo_frame: "_top" }, class: "btn btn-sm btn-outline-secondary" %>
                 </div>
               </div>
-            </div>
-          <% end %>
-        </div>
-        <div class="mt-4 d-flex justify-content-center">
-          <%= paginate @diaries, param_name: :diaries_page %>
-        </div>
-      <% else %>
-        <div class="text-center py-5 text-muted border rounded bg-light">
-          まだ日記がありません。
-        </div>
+            <% end %>
+          </div>
+          
+          <div class="mt-4 d-flex justify-content-center">
+            <%= paginate @diaries, param_name: :diaries_page %>
+          </div>
+        <% else %>
+          <div class="text-center py-5 text-muted border rounded bg-light">
+            まだ日記がありません。または検索に一致しませんでした。
+          </div>
+        <% end %>
       <% end %>
     </div>
 
     <%# --- TAB 2: レビュー履歴 --- %>
     <div class="tab-pane fade" id="reviews" role="tabpanel">
-      <div class="row">
-        <% if @reviews.any? %>
-          <% @reviews.each do |review| %>
-            <div class="col-md-6 mb-4">
-              <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                  <div class="d-flex justify-content-between mb-2">
-                    <span class="badge bg-secondary">カテゴリ: <%= review.category || '未分類' %></span>
-                    <span class="text-warning">
-                      <%= "★" * (review.rating || 0) %>
-                    </span>
-                  </div>
-                  <h5 class="card-title fw-bold">
-                    <%= link_to review.title, review_path(review), class: "text-decoration-none text-dark" %>
-                  </h5>
-                  <div class="p-2 bg-light rounded text-muted small mt-2">
-                    <i class="fas fa-robot me-1"></i>
-                    <%= truncate(review.body, length: 60) %>
+      <%= turbo_frame_tag "reviews_frame" do %>
+        <%# 🔍 レビューの検索フォーム %>
+        <%= search_form_for @q_reviews, as: :q_reviews, url: mypage_path, class: "mb-3 d-flex gap-2" do |f| %>
+          <%= f.search_field :title_or_body_cont, class: "form-control bg-light", placeholder: "タイトルや本文で検索..." %>
+          <%= f.submit "検索", class: "btn btn-outline-secondary px-4" %>
+        <% end %>
+
+        <div class="row">
+          <% if @reviews.any? %>
+            <% @reviews.each do |review| %>
+              <div class="col-md-6 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                      <span class="badge bg-light text-dark border"><%= Review.category_options.to_h.invert[review.category] || "未分類" %></span>
+                      <span class="text-warning fw-bold"><i class="fas fa-star me-1"></i><%= review.rating || 0 %></span>
+                    </div>
+                    
+                    <h5 class="card-title fw-bold mb-3">
+                      <%# 💡 詳細画面へ脱出 %>
+                      <%= link_to truncate(review.title, length: 25), review_path(review), data: { turbo_frame: "_top" }, class: "text-decoration-none text-dark stretched-link" %>
+                    </h5>
+
+                    <% if review.emotion_score.present? %>
+                      <% 
+                        is_user_score = (review.user_score? && review.user_emotion_score.present?)
+                        display_score = is_user_score ? review.user_emotion_score : review.emotion_score 
+                      %>
+                      <div class="mb-3">
+                        <span class="badge <%= is_user_score ? 'bg-primary text-primary border-primary' : 'bg-danger text-danger border-danger' %> bg-opacity-10 border border-opacity-25 rounded-pill">
+                          <i class="fas <%= is_user_score ? 'fa-user-edit' : 'fa-robot' %> me-1"></i>
+                          熱量: <%= (display_score * 10).round %>%
+                        </span>
+                      </div>
+                    <% end %>
                   </div>
                 </div>
               </div>
+            <% end %>
+            <div class="col-12 mt-3 d-flex justify-content-center">
+              <%= paginate @reviews, param_name: :reviews_page %>
+            </div>
+          <% else %>
+            <div class="col-12 text-center py-5 text-muted border rounded bg-light">
+              まだレビューがありません。
             </div>
           <% end %>
-          <div class="col-12 mt-3 d-flex justify-content-center">
-            <%= paginate @reviews, param_name: :reviews_page %>
-          </div>
-        <% else %>
-          <div class="col-12 text-center py-5 text-muted border rounded bg-light">
-            まだAIレビューがありません。
-          </div>
-        <% end %>
-      </div>
+        </div>
+      <% end %>
     </div>
 
     <%# --- TAB 3: いいね一覧 --- %>
     <div class="tab-pane fade" id="favorites" role="tabpanel">
-      <div class="row">
-        <% if @favorite_reviews.any? %>
-          <% @favorite_reviews.each do |review| %>
-            <div class="col-md-6 mb-4">
-              <div class="card h-100 border-danger border-opacity-25 shadow-sm">
-                <div class="card-body">
-                  <div class="d-flex justify-content-between mb-2">
-                    <span class="badge bg-danger bg-opacity-75"><i class="fas fa-heart"></i> いいね済み</span>
-                    <small class="text-muted"><%= review.user.name %>さんの投稿</small>
+      <%= turbo_frame_tag "favorites_frame" do %>
+        <%# 🔍 いいねの検索フォーム %>
+        <%= search_form_for @q_favorites, as: :q_favorites, url: mypage_path, class: "mb-3 d-flex gap-2" do |f| %>
+          <%= f.search_field :title_or_body_cont, class: "form-control bg-light", placeholder: "いいねしたレビューを検索..." %>
+          <%= f.submit "検索", class: "btn btn-outline-secondary px-4" %>
+        <% end %>
+
+        <div class="row">
+          <% if @favorite_reviews.any? %>
+            <% @favorite_reviews.each do |review| %>
+              <div class="col-md-6 mb-4">
+                <div class="card h-100 border-danger border-opacity-25 shadow-sm">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                      <span class="badge bg-danger bg-opacity-75"><i class="fas fa-heart"></i> いいね済み</span>
+                      <small class="text-muted"><%= review.user.name %>さんの投稿</small>
+                    </div>
+                    <h5 class="card-title fw-bold">
+                      <%# 💡 詳細画面へ脱出 %>
+                      <%= link_to truncate(review.title, length: 25), review_path(review), data: { turbo_frame: "_top" }, class: "text-decoration-none text-dark stretched-link" %>
+                    </h5>
+                    <% if review.emotion_score.present? %>
+                      <% display_score = (review.user_score? && review.user_emotion_score.present?) ? review.user_emotion_score : review.emotion_score %>
+                      <div class="mt-2">
+                        <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-pill">
+                          <i class="fas fa-fire-alt me-1"></i>熱量: <%= (display_score * 10).round %>%
+                        </span>
+                      </div>
+                    <% end %>
                   </div>
-                  <h5 class="card-title fw-bold">
-                    <%= link_to review.title, diary_path(review.diary), class: "text-decoration-none text-dark" %>
-                  </h5>
-                  <p class="card-text text-muted small">
-                    <%= truncate(review.diary.content, length: 50) %>
-                  </p>
                 </div>
               </div>
+            <% end %>
+            <div class="col-12 mt-3 d-flex justify-content-center">
+              <%= paginate @favorite_reviews, param_name: :favorites_page %>
+            </div>
+          <% else %>
+            <div class="col-12 text-center py-5 text-muted border rounded bg-light">
+              まだ「いいね」したレビューがありません。
             </div>
           <% end %>
-          <div class="col-12 mt-3 d-flex justify-content-center">
-            <%= paginate @favorite_reviews, param_name: :favorites_page %>
+        </div>
+      <% end %>
+    </div>
+
+    <%# --- TAB 4: 分析レポート履歴 --- %>
+    <div class="tab-pane fade" id="reports" role="tabpanel" aria-labelledby="reports-tab">
+      <%= turbo_frame_tag "reports_frame" do %>
+        <% if @weekly_reports.any? %>
+          <div class="list-group shadow-sm mb-4">
+            <% @weekly_reports.each do |report| %>
+              <%# 💡 枠全体をリンクにして、詳細画面へ飛べるようにする %>
+              <%= link_to weekly_report_path(report), data: { turbo_frame: "_top" }, class: "list-group-item list-group-item-action p-4 border-info border-opacity-25" do %>
+                
+                <div class="d-flex w-100 justify-content-between align-items-center mb-2">
+                  <h5 class="mb-1 fw-bold text-info-emphasis">
+                    <i class="fas fa-magic me-2 text-info"></i>
+                    <%= report.start_date.strftime('%Y年%m月%d日') %> 〜 <%= report.end_date.strftime('%m月%d日') %> の振り返り
+                  </h5>
+                  <small class="text-muted"><%= time_ago_in_words(report.created_at) %>前</small>
+                </div>
+                
+                <%# レポート本文のプレビュー（100文字で省略） %>
+                <p class="mb-0 text-secondary" style="font-size: 0.95rem;">
+                  <%= truncate(report.content, length: 100) %>
+                </p>
+                
+              <% end %>
+            <% end %>
+          </div>
+          
+          <div class="mt-4 d-flex justify-content-center">
+            <%= paginate @weekly_reports, param_name: :reports_page %>
           </div>
         <% else %>
-          <div class="col-12 text-center py-5 text-muted border rounded bg-light">
-            まだ「いいね」したレビューがありません。
+          <div class="text-center py-5 text-muted border rounded bg-light border-info border-opacity-25">
+            <i class="fas fa-chart-line fa-2x text-info opacity-50 mb-3"></i><br>
+            まだAI分析レポートがありません。<br>「今週の振り返りを作成する」ボタンから作ってみましょう！
           </div>
         <% end %>
-      </div>
+      <% end %>
     </div>
 
   </div>
+
 </div>

@@ -1,6 +1,6 @@
 class HomesController < ApplicationController
   # ログインなしでもアクセスして良いページを指定する
-  allow_unauthenticated_access only: %i[ top about ]
+  allow_unauthenticated_access only: %i[ top about terms privacy ]
 
   def top
     # データベースから「公開中(is_active: true)」かつ
@@ -13,4 +13,13 @@ class HomesController < ApplicationController
 
   def about
   end
+
+  # 利用規約
+  def terms
+  end
+
+  # プライバシーポリシー
+  def privacy
+  end
+
 end

@@ -60,12 +60,11 @@ class ReviewsController < ApplicationController
   # [Step 1] 商品名と詳細を入力する画面
   def select_type
     if params[:diary_id].present?
-      # 日記から遷移してきた場合：元の日記を特定する
       @diary = current_user.diaries.find(params[:diary_id])
     else
-      # ダッシュボード等から直接来た場合：日記は使わない
       @diary = nil
     end
+    # ※キャンペーンからの遷移に対応するため、ビュー側で campaign_id を送る準備を後ほどします
   end
 
   # [Step 2] AI生成を実行して、投稿画面(new)へデータを渡す
@@ -73,6 +72,8 @@ class ReviewsController < ApplicationController
     additional_info = params[:detail] # フォームから送られてきた詳細情報
     diary_content = ""
     diary_id = nil
+    campaign_prompt = nil # 初期値は空にしておく
+    campaign_id = params[:campaign_id] # ビューから送られてくる予定のキャンペーンID
 
     # 日記が選ばれている場合のみ、日記の情報を取得する
     if params[:diary_id].present?
@@ -80,29 +81,36 @@ class ReviewsController < ApplicationController
       diary_content = diary.content
       diary_id = diary.id
     end
+
+    # キャンペーンIDがある場合、企業プロンプトを取得する
+    if campaign_id.present?
+      campaign = Campaign.find(campaign_id)
+      campaign_prompt = campaign.ai_prompt
+    end
     
-    # 専門家(Service)に情報を渡して、レビューを作ってもらう
-    # 日記がない場合は diary_content は空文字になりますが、additional_info でAIが文章を作ります
-    ai_result = AiReviewGenerationService.new(diary_content, additional_info).call
+    # 専門家(Service)に情報を渡す。campaign_prompt も一緒に渡す！
+    ai_result = AiReviewGenerationService.new(diary_content, additional_info, campaign_prompt: campaign_prompt).call
     
     # 生成結果を使って、新しいレビューの箱を作る
     @review = Review.new
     @review.title = ai_result["title"]
     @review.body = ai_result["body"]
+    @review.emotion_score = ai_result["emotion_score"] # AIが算出した感情スコア！
     @review.diary_id = diary_id
+    @review.campaign_id = campaign_id # レビューとキャンペーンを紐付ける
     
     # AIが作った内容が入った状態で、新規投稿画面(new)を表示する
     render :new, status: :unprocessable_entity
   end
 
+
+
+  
   private
 
   # ストロングパラメータ
   def review_params
-    # categoryを数値(integer)に変換して受け取るように修正
-    params.require(:review).permit(:diary_id, :title, :body, :rating, :category, :is_published).tap do |whitelisted|
-      whitelisted[:category] = whitelisted[:category].to_i if whitelisted[:category].present?
-    end
+    params.require(:review).permit(:diary_id, :campaign_id, :title, :body, :rating, :category, :is_published, :emotion_score, :user_emotion_score, :display_emotion_type)
   end
 
 end

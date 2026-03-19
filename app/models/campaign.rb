@@ -1,6 +1,7 @@
 class Campaign < ApplicationRecord
   belongs_to :user # 作成者（管理者）
   has_many :reviews
+  has_many :ai_interviews
 
   # Ransack用の設定
   # 1. 検索と並び替えを許可するカラムをすべて列挙します

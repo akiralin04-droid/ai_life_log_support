@@ -36,10 +36,14 @@
           <div class="card-body text-center p-4">
             <h5 class="card-title fw-bold">✨ レビューを書く</h5>
             <p class="card-text text-muted small mt-2">AIの分析から記事を作成・共有します。</p>
-            <%= link_to "レビューを書く", select_type_reviews_path, class: "btn btn-success mt-2" %>
+            <%# 🌟 修正：直接チャット画面に飛ぶボタンに変更 %>
+            <div class="d-grid mt-3">
+              <%= button_to "レビューを書く", ai_interviews_path, method: :post, class: "btn btn-success w-100 shadow-sm" %>
+            </div>
           </div>
         </div>
       </div>
+      
     </div>
 
     <%# お知らせ・キャンペーン情報エリア（動的化） %>
@@ -76,6 +80,76 @@
     </div>
   </div>
   
+  <%# 初回オンボーディング（チュートリアル）モーダル %>
+  <%# ========================================== %>
+  <% unless current_user.onboarding_completed %>
+    <%# data-bs-backdrop="static" で、外側をクリックしても閉じないようにし、確実に読んでもらいます %>
+    <div class="modal fade" id="onboardingModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+          
+          <div class="modal-body p-0">
+            <%# Bootstrapのカルーセル（スライド）機能を使用 %>
+            <div id="onboardingCarousel" class="carousel slide" data-bs-ride="false" data-bs-wrap="false">
+              
+              <%# スライドの下部にあるドットのインジケーター %>
+              <div class="carousel-indicators mb-2">
+                <button type="button" data-bs-target="#onboardingCarousel" data-bs-slide-to="0" class="active bg-primary" aria-current="true"></button>
+                <button type="button" data-bs-target="#onboardingCarousel" data-bs-slide-to="1" class="bg-primary"></button>
+                <button type="button" data-bs-target="#onboardingCarousel" data-bs-slide-to="2" class="bg-primary"></button>
+              </div>
+
+              <div class="carousel-inner text-center">
+                <%# スライド1：ウェルカム %>
+                <div class="carousel-item active p-5">
+                  <div class="mb-4"><i class="fas fa-book-open text-primary" style="font-size: 4rem;"></i></div>
+                  <h3 class="fw-bold mb-3">AI Life Log Support へようこそ！</h3>
+                  <p class="text-muted fs-5 mb-5">ここは、あなたの何気ない日々の記録を<br>AIが価値ある「レビュー」へと変える場所です。</p>
+                  <button class="btn btn-outline-primary rounded-pill px-4" data-bs-target="#onboardingCarousel" data-bs-slide="next">次へ <i class="fas fa-chevron-right ms-1"></i></button>
+                </div>
+
+                <%# スライド2：音声入力の魅力 %>
+                <div class="carousel-item p-5">
+                  <div class="mb-4"><i class="fas fa-microphone-alt text-danger" style="font-size: 4rem;"></i></div>
+                  <h3 class="fw-bold mb-3">声で手軽に記録（無限推敲）</h3>
+                  <p class="text-muted fs-5 mb-5">タイピングは不要です。マイクに向かって独り言を話すだけで、<br>AIが綺麗に文章を整え、対話しながら深掘りしてくれます。</p>
+                  <div class="d-flex justify-content-center gap-3">
+                    <button class="btn btn-light rounded-pill px-4" data-bs-target="#onboardingCarousel" data-bs-slide="prev"><i class="fas fa-chevron-left me-1"></i> 戻る</button>
+                    <button class="btn btn-outline-primary rounded-pill px-4" data-bs-target="#onboardingCarousel" data-bs-slide="next">次へ <i class="fas fa-chevron-right ms-1"></i></button>
+                  </div>
+                </div>
+
+                <%# スライド3：完了して始める %>
+                <div class="carousel-item p-5">
+                  <div class="mb-4"><i class="fas fa-rocket text-success" style="font-size: 4rem;"></i></div>
+                  <h3 class="fw-bold mb-3">さあ、始めましょう！</h3>
+                  <p class="text-muted fs-5 mb-4">キャンペーンに参加して企業の課題を解決したり、<br>自分の心の変化（感情スコア）を分析したりできます。</p>
+                  <div class="d-flex justify-content-center gap-3 mt-4">
+                    <button class="btn btn-light rounded-pill px-4" data-bs-target="#onboardingCarousel" data-bs-slide="prev"><i class="fas fa-chevron-left me-1"></i> 戻る</button>
+                    <%# ここでコントローラーへ完了のリクエストを送信する %>
+                    <%= link_to "さっそく始める", onboarding_path, data: { turbo_method: :patch }, class: "btn btn-primary rounded-pill px-5 shadow-sm fw-bold" %>
+                  </div>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+
+    <%# 画面が読み込まれた時に、自動でモーダルを起動するJavaScript %>
+    <script>
+      document.addEventListener("turbo:load", function() {
+        var onboardingModalEl = document.getElementById('onboardingModal');
+        if (onboardingModalEl) {
+          var myModal = new bootstrap.Modal(onboardingModalEl);
+          myModal.show();
+        }
+      });
+    </script>
+  <% end %>
 
 <% else %>
   <%# ========================================== %>

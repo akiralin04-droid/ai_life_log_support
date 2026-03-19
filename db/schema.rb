@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_09_023432) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_19_054742) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -37,6 +37,28 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_09_023432) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "ai_interviews", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "campaign_id"
+    t.integer "diary_id"
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "purpose", default: 0, null: false
+    t.index ["campaign_id"], name: "index_ai_interviews_on_campaign_id"
+    t.index ["diary_id"], name: "index_ai_interviews_on_diary_id"
+    t.index ["user_id"], name: "index_ai_interviews_on_user_id"
+  end
+
+  create_table "ai_messages", force: :cascade do |t|
+    t.integer "ai_interview_id", null: false
+    t.integer "role", default: 0, null: false
+    t.text "content", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ai_interview_id"], name: "index_ai_messages_on_ai_interview_id"
   end
 
   create_table "campaigns", force: :cascade do |t|
@@ -70,7 +92,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_09_023432) do
     t.boolean "is_published", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "schedule"
+    t.text "raw_voice_text"
+    t.integer "weekly_report_id"
     t.index ["user_id"], name: "index_diaries_on_user_id"
+    t.index ["weekly_report_id"], name: "index_diaries_on_weekly_report_id"
   end
 
   create_table "favorites", force: :cascade do |t|
@@ -103,6 +129,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_09_023432) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.float "emotion_score"
+    t.float "user_emotion_score"
+    t.integer "display_emotion_type", default: 0, null: false
     t.index ["campaign_id"], name: "index_reviews_on_campaign_id"
     t.index ["diary_id"], name: "index_reviews_on_diary_id"
     t.index ["user_id"], name: "index_reviews_on_user_id"
@@ -236,15 +264,32 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_09_023432) do
     t.text "introduction"
     t.integer "role", default: 0, null: false
     t.boolean "is_active", default: true, null: false
+    t.boolean "onboarding_completed", default: false, null: false
+    t.text "custom_format"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
+  end
+
+  create_table "weekly_reports", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.date "start_date"
+    t.date "end_date"
+    t.text "content"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_weekly_reports_on_user_id"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "ai_interviews", "campaigns"
+  add_foreign_key "ai_interviews", "diaries"
+  add_foreign_key "ai_interviews", "users"
+  add_foreign_key "ai_messages", "ai_interviews"
   add_foreign_key "campaigns", "users"
   add_foreign_key "comments", "reviews"
   add_foreign_key "comments", "users"
   add_foreign_key "diaries", "users"
+  add_foreign_key "diaries", "weekly_reports"
   add_foreign_key "favorites", "reviews"
   add_foreign_key "favorites", "users"
   add_foreign_key "review_tags", "reviews"
@@ -258,4 +303,5 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_09_023432) do
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "weekly_reports", "users"
 end

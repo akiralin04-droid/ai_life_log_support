@@ -1,22 +1,11 @@
 Rails.application.routes.draw do
-  get "campaigns/show"
-  get "reviews/index"
-  get "reviews/new"
-  get "reviews/show"
-  get "reviews/edit"
-  get "diaries/index"
-  get "diaries/new"
-  get "diaries/show"
-  get "users/index"
-  get "users/show"
-  get "users/edit"
-  get "registrations/new"
-  get "searches/search"
-  get "homes/top"
-  get "homes/about"
   # トップページ & About
   root to: "homes#top"
   get "home/about" => "homes#about", as: "about"
+
+  # 利用規約 & プライバシーポリシー
+  get "home/terms" => "homes#terms", as: "terms"
+  get "home/privacy" => "homes#privacy", as: "privacy"
 
   # 検索
   get "search" => "searches#search"
@@ -34,9 +23,10 @@ Rails.application.routes.draw do
   # ユーザー機能
   resources :users, only: [:index, :show, :edit, :update]
 
-  # マイページ (showのみ)
+  # マイページ 
   resource :mypage, only: [:show]
-
+  resources :weekly_reports, only:[:show, :create, :destroy]
+  
   # 日記機能
   resources :diaries do
     # ▼▼▼ 追加: コレクションルーティング ▼▼▼
@@ -58,27 +48,34 @@ Rails.application.routes.draw do
     resource :favorites, only: [:create, :destroy], module: :reviews
   end
 
+  # AIチャット・インタビュー機能
+  resources :ai_interviews, only: [:show, :create] do
+    resources :ai_messages, only: [:create] # チャット内でメッセージを送信するため
+    member do
+      get :finalize  # 💡 追加 (自動遷移用)
+      post :finalize # 💡 (ボタン用)
+    end
+  end
+
   # キャンペーン機能
   resources :campaigns, only: [:show]
 
   # 管理者機能 (Namespace)
   namespace :admin do
-    get "dashboards/index"
-    get "campaigns/index"
-    get "campaigns/new"
-    get "campaigns/edit"
-    get "reviews/index"
-    get "reviews/show"
-    get "users/index"
-    get "users/show"
     get "/" => "dashboards#index"
-    resources :users, only: [:index, :show, :update]
+
+    # ユーザー・レビュー・日記・キャンペーンの管理（resourcesにまとめる）
+    resources :users, only:[:index, :show, :update]
     resources :reviews, only: [:index, :show, :destroy, :update]
-    resources :campaigns
-
-    # 管理者用「日記管理」のルーティング
     resources :diaries, only: [:index, :show, :destroy, :update]
-
+    resources :campaigns
   end
+
+  # オンボーディング完了用のルーティング（更新のみ）
+  resource :onboarding, only: [:update]
+
+  # PWA対応 (Rails 8 標準機能)
+  get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
+  get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
 end

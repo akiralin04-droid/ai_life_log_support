@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  ai_interview: one
+  role: 1
+  content: MyText
+
+two:
+  ai_interview: two
+  role: 1
+  content: MyText

@@ -1,36 +1,45 @@
 class MypagesController < ApplicationController
-  # ログイン必須（実装に合わせてコメントアウトを外してください）
-  # before_action :require_login 
+  before_action :authenticate_user! if respond_to?(:authenticate_user!)
 
   def show
     @user = current_user
+
+    # カレンダー用のデータ取得（月ごとに切り替え対応！） 
+    # URLのパラメータに month=2026-03 のような指定があればその月を、なければ「今月」を基準にする
+    @current_month = params[:month] ? Date.parse(params[:month] + "-01") : Date.today.beginning_of_month
+
+    # カレンダーの表示範囲（月初の週の日曜日から、月末の週の土曜日まで）
+    @start_date = @current_month.beginning_of_week(:sunday)
+    @end_date = @current_month.end_of_month.end_of_week(:sunday)
+
+    # 該当期間の日記をすべて取得
+    # 【N+1対策】カレンダー内でレビューの有無を判定するために review を一緒に取得
+    diaries_in_range = @user.diaries.includes(:review).where(created_at: @start_date.beginning_of_day..@end_date.end_of_day)
+
+    # 件数だけではなく、日記のデータそのものを日付ごとにグループ化して渡す 
+    @diaries_by_date = diaries_in_range.group_by { |diary| diary.created_at.to_date }
     
-    # 統計情報
     @diary_count = @user.diaries.count
-    # 自分の日記についたレビューの総数
-    @review_count = Review.joins(:diary).where(diaries: { user_id: @user.id }).count
+    @review_count = @user.reviews.count
 
-    # --- タブ表示用データの取得 ---
+    # 最新のウィークリーレポートを取得 
+    @latest_weekly_report = @user.weekly_reports.order(created_at: :desc).first
 
-    # Tab 1: 日記履歴 (全ての日記)
-    # パラメータ名: diaries_page
-    @diaries = @user.diaries.includes(:review)
-                    .order(created_at: :desc)
-                    .page(params[:diaries_page]).per(5)
+    # --- タブ1: 日記履歴（検索付き） ---
+    @q_diaries = @user.diaries.ransack(params[:q_diaries], search_key: :q_diaries)
+    @diaries = @q_diaries.result.includes(:review).order(created_at: :desc).page(params[:diaries_page]).per(5)
 
-    # Tab 2: レビュー履歴 (自分の日記へのAI分析結果)
-    # パラメータ名: reviews_page
-    @reviews = Review.joins(:diary).where(diaries: { user_id: @user.id })
-                     .includes(:diary)
-                     .order(created_at: :desc)
-                     .page(params[:reviews_page]).per(5)
+    # --- タブ2: レビュー履歴（検索付き） ---
+    @q_reviews = @user.reviews.ransack(params[:q_reviews], search_key: :q_reviews)
+    # 【N+1対策】レビューに関連する campaign も一緒に取得しておく
+    @reviews = @q_reviews.result.includes(:diary, :campaign).order(created_at: :desc).page(params[:reviews_page]).per(5)
 
-    # Tab 3: いいね一覧 (自分がいいねしたレビュー)
-    # パラメータ名: favorites_page
-    # ※ER図にFavoritesテーブルがある前提です
-    @favorite_reviews = @user.favorite_reviews
-                             .includes(:diary, :user) # N+1対策
-                             .order('favorites.created_at DESC')
-                             .page(params[:favorites_page]).per(5)
+    # --- タブ3: いいね一覧（検索付き） ---
+    @q_favorites = @user.favorite_reviews.ransack(params[:q_favorites], search_key: :q_favorites)
+    # 【N+1対策】いいねしたレビューの作成者(user)だけでなく、元日記(diary)やキャンペーン(campaign)も取得！
+    @favorite_reviews = @q_favorites.result.includes(:user, :diary, :campaign).order('favorites.created_at DESC').page(params[:favorites_page]).per(5)
+
+    # タブ4（AIレポート履歴）用のデータ取得
+    @weekly_reports = @user.weekly_reports.order(created_at: :desc).page(params[:reports_page]).per(5)
   end
 end
