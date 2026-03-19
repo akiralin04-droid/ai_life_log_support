@@ -103,7 +103,7 @@
           
           <% else %>
             <p class="fw-bold text-dark mb-2">この日記の中から、特定の出来事を選んでレビューを作成しますか？</p>
-            <p class="small text-muted mb-3">（例：「APEX」「駅前のカフェ」など、レビューしたい対象を入力してください）</p>
+            <p class="small text-muted mb-3">（例：「駅前のカフェ」「映画」など、レビューしたい対象を入力してください）</p>
             
             <%# 💡 変更：単なるボタンから、対象を入力するフォームに変更！ %>
             <%= form_with url: ai_interviews_path, local: true, method: :post, class: "d-flex flex-column align-items-center" do |f| %>
