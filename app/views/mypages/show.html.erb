@@ -32,6 +32,14 @@
             <%= simple_format(@user.introduction.presence || "自己紹介文はまだ設定されていません。") %>
           </p>
 
+          <%# カスタムフォーマット確認パネル %>
+          <% if @user.custom_format.present? %>
+            <div class="alert alert-primary bg-primary bg-opacity-10 border-primary border-opacity-25 p-3 mb-4 text-start small shadow-sm">
+              <h6 class="fw-bold text-primary mb-2"><i class="fas fa-robot me-1"></i> My AIフォーマット（有効）</h6>
+              <div style="white-space: pre-wrap; font-family: monospace; color: #333;"><%= @user.custom_format %></div>
+            </div>
+          <% end %>
+
           <%# 統計バッジ %>
           <div class="d-flex gap-3 justify-content-center justify-content-md-start mb-3">
             <div class="border rounded px-3 py-1 bg-light text-center">

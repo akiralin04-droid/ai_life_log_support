@@ -1,0 +1,57 @@
+=> 
+[[32m#<User:0x00007f05e5831278[0m
+  id: [34m[1m1[0m,
+  email_address: [31m[1m"[0m[31m[FILTERED][0m[31m[1m"[0m,
+  password_digest: [31m[1m"[0m[31m[FILTERED][0m[31m[1m"[0m,
+  created_at:
+   [31m[1m"[0m[31m2026-03-03 00:21:40.634112000 +0000[0m[31m[1m"[0m,
+  updated_at:
+   [31m[1m"[0m[31m2026-03-09 00:19:50.759136000 +0000[0m[31m[1m"[0m,
+  name: [31m[1m"[0m[31mテスト[0m[31m[1m"[0m,
+  introduction: [36m[1mnil[0m,
+  role: [31m[1m"[0m[31mgeneral[0m[31m[1m"[0m,
+  is_active: [36m[1mtrue[0m,
+  onboarding_completed: [36m[1mfalse[0m,
+  custom_format: [36m[1mnil[0m[32m>[0m,
+ [32m#<User:0x00007f05e76e7820[0m
+  updated_at:
+   [31m[1m"[0m[31m2026-03-19 06:20:35.587444000 +0000[0m[31m[1m"[0m,
+  id: [34m[1m2[0m,
+  email_address: [31m[1m"[0m[31m[FILTERED][0m[31m[1m"[0m,
+  password_digest: [31m[1m"[0m[31m[FILTERED][0m[31m[1m"[0m,
+  created_at:
+   [31m[1m"[0m[31m2026-03-04 23:13:27.351003000 +0000[0m[31m[1m"[0m,
+  name: [31m[1m"[0m[31mゲストユーザー[0m[31m[1m"[0m,
+  introduction: [31m[1m"[0m[31mゲストユーザーです[0m[31m[1m"[0m,
+  role: [31m[1m"[0m[31mgeneral[0m[31m[1m"[0m,
+  is_active: [36m[1mtrue[0m,
+  onboarding_completed: [36m[1mtrue[0m,
+  custom_format: [31m[1m"[0m[31mツンデレ口調で作成してみて[0m[31m[1m"[0m[32m>[0m,
+ [32m#<User:0x00007f05e76e76e0[0m
+  id: [34m[1m3[0m,
+  email_address: [31m[1m"[0m[31m[FILTERED][0m[31m[1m"[0m,
+  password_digest: [31m[1m"[0m[31m[FILTERED][0m[31m[1m"[0m,
+  created_at:
+   [31m[1m"[0m[31m2026-03-08 06:04:27.667707000 +0000[0m[31m[1m"[0m,
+  updated_at:
+   [31m[1m"[0m[31m2026-03-09 01:00:45.369513000 +0000[0m[31m[1m"[0m,
+  name: [31m[1m"[0m[31m[1m"[0m,
+  introduction: [31m[1m"[0m[31m[1m"[0m,
+  role: [31m[1m"[0m[31mgeneral[0m[31m[1m"[0m,
+  is_active: [36m[1mfalse[0m,
+  onboarding_completed: [36m[1mfalse[0m,
+  custom_format: [36m[1mnil[0m[32m>[0m,
+ [32m#<User:0x00007f05e76e75a0[0m
+  id: [34m[1m4[0m,
+  email_address: [31m[1m"[0m[31m[FILTERED][0m[31m[1m"[0m,
+  password_digest: [31m[1m"[0m[31m[FILTERED][0m[31m[1m"[0m,
+  created_at:
+   [31m[1m"[0m[31m2026-03-08 22:55:10.171353000 +0000[0m[31m[1m"[0m,
+  updated_at:
+   [31m[1m"[0m[31m2026-03-19 05:59:39.434882000 +0000[0m[31m[1m"[0m,
+  name: [31m[1m"[0m[31m管理者[0m[31m[1m"[0m,
+  introduction: [31m[1m"[0m[31m[1m"[0m,
+  role: [31m[1m"[0m[31madmin[0m[31m[1m"[0m,
+  is_active: [36m[1mtrue[0m,
+  onboarding_completed: [36m[1mtrue[0m,
+  custom_format: [36m[1mnil[0m[32m>[0m]
