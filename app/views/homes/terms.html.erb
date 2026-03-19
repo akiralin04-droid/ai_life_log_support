@@ -1,0 +1,50 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-9 col-md-11">
+      
+      <div class="text-center mb-5">
+        <h2 class="fw-bold"><i class="fas fa-file-contract text-secondary me-2"></i>利用規約</h2>
+        <p class="text-muted mt-2">最終更新日: <%= Time.current.strftime("%Y年%m月%d日") %></p>
+      </div>
+
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-4 p-md-5 text-dark" style="line-height: 1.8;">
+          
+          <p class="mb-5">
+            この利用規約（以下、「本規約」といいます。）は、AI Life Log Support（以下、「本サービス」といいます。）の利用条件を定めるものです。ユーザーの皆さまには、本規約に従って本サービスをご利用いただきます。
+          </p>
+
+          <h5 class="fw-bold mt-4 border-bottom pb-2 text-primary">第1条（適用）</h5>
+          <p class="mb-4">本規約は、ユーザーと本サービス間の、本サービスの利用に関わる一切の関係に適用されるものとします。</p>
+
+          <h5 class="fw-bold mt-4 border-bottom pb-2 text-primary">第2条（AIおよび音声データの取り扱い）</h5>
+          <p class="mb-4">
+            1. 本サービスは、ユーザーが入力したテキストおよび音声データ（Web Speech APIを利用した音声認識）をもとに、AIを利用して日記の推敲やレビューの生成を行います。<br>
+            2. ユーザーが入力したデータは、AIによる解析およびサービスの機能提供の目的でのみ使用され、ユーザーの同意なく第三者に公開されることはありません。
+          </p>
+
+          <h5 class="fw-bold mt-4 border-bottom pb-2 text-primary">第3条（禁止事項）</h5>
+          <p class="mb-4">
+            ユーザーは、本サービスの利用にあたり、以下の行為をしてはなりません。<br>
+            1. 法令または公序良俗に違反する行為<br>
+            2. 他のユーザー、またはその他の第三者の個人情報を不正に収集・公開する行為<br>
+            3. AIに対して、暴力的、差別的、または不適切な出力を意図的に誘導するプロンプトを入力する行為<br>
+            4. 本サービスのシステムやサーバーに過度な負荷をかける行為
+          </p>
+
+          <h5 class="fw-bold mt-4 border-bottom pb-2 text-primary">第4条（免責事項）</h5>
+          <p class="mb-4">
+            1. 本サービスはポートフォリオとして作成・公開されているものであり、事前の通知なくシステムを停止、または提供を終了することがあります。<br>
+            2. AIが生成する分析結果やテキスト（感情スコアやレビュー内容）の正確性、完全性、妥当性について、本サービスは一切の保証をいたしません。これによって生じた損害について、当方は一切の責任を負わないものとします。
+          </p>
+
+          <div class="text-center mt-5">
+            <%= link_to "トップページへ戻る", root_path, class: "btn btn-outline-secondary rounded-pill px-5 fw-bold" %>
+          </div>
+          
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

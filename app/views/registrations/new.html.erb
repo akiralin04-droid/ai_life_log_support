@@ -57,6 +57,14 @@
             <%= f.password_field :password_confirmation, class: "form-control" %>
           </div>
 
+          <%# 規約同意の文言 %>
+          <div class="mb-4 mt-4 text-center small text-muted">
+            登録ボタンを押すことで、<br>
+            <%= link_to "利用規約", terms_path, target: "_blank", class: "text-primary text-decoration-none" %> および
+            <%= link_to "プライバシーポリシー", privacy_path, target: "_blank", class: "text-primary text-decoration-none" %>
+            <br>に同意したものとみなします。
+          </div>
+
           <%# 登録ボタン %>
           <div class="d-grid gap-2"> <%# ボタンを横幅いっぱいに広げる設定 %>
             <%= f.submit "登録する", class: "btn btn-primary" %> <%# 青いボタン %>
