@@ -25,6 +25,14 @@
     <meta name="twitter:description" content="AIがあなたの「日記」を分析し、共有できる「レビュー」を生成します。">
 
 
+    <!-- PWA（スマホアプリ化）設定 -->
+    <meta name="theme-color" content="#0d6efd">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="apple-touch-icon" href="/icon.png">
+    <%= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+
+
     <!-- Railsのセキュリティ対策（偽サイトからの攻撃を防ぐ） -->
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
