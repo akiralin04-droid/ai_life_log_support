@@ -24,21 +24,19 @@ class RegistrationsController < ApplicationController
     @user.role = 0
 
     # データベースへの保存を試みます
-    if @user.save
-      # 成功した場合の処理：
+    # データベースの激怒（重複エラー）を優しくキャッチする最強の安全網 
+    begin
+      if @user.save
+        start_new_session_for @user
+        redirect_to root_path, notice: "アカウント登録が完了しました！"
+      else
+        render :new, status: :unprocessable_entity
+      end
       
-      # 登録したユーザー情報を使って、そのままログイン状態にします。
-      # (ユーザーにわざわざログイン画面で入力させる手間を省くため)
-      start_new_session_for @user
-      
-      # トップページへ画面を移動させ、「完了しました」とメッセージを表示します。
-      redirect_to root_path, notice: "アカウント登録が完了しました！"
-    else
-      # 失敗した場合（名前が空、パスワードが短いなど）の処理：
-      
-      # もう一度、入力画面(new)を表示します。
-      # status: :unprocessable_entity は「処理できませんでした」というエラー信号をブラウザに送る設定です。
-      # (Rails 8 / Turbo では、これをつけないとエラーメッセージが表示されません)
+    rescue ActiveRecord::RecordNotUnique => e
+      # 万が一Railsのチェックをすり抜けて、データベースから「重複してるぞ！」と怒られた場合、
+      # 500エラーでシステムを落とさず、画面に赤いエラー文字として優しく表示させます。
+      @user.errors.add(:email_address, "はすでに登録されています。別のメールアドレスをお試しください。")
       render :new, status: :unprocessable_entity
     end
   end
