@@ -200,11 +200,20 @@
               <%= simple_format(@latest_weekly_report.content) %>
             </div>
             
-            <div class="mt-auto text-end border-top pt-3">
-              <%# 削除して作り直すためのボタン %>
-              <%= link_to weekly_report_path(@latest_weekly_report), data: { turbo_method: :delete, turbo_confirm: "現在のレポートを削除して作り直しますか？" }, class: "btn btn-outline-danger btn-sm rounded-pill" do %>
-                <i class="fas fa-redo me-1"></i> 作り直す
+            <div class="mt-auto border-top pt-3">
+              <%# 未分析の日記がある場合は「新しく作成する」ボタンを一番目立つように表示 %>
+              <% if current_user.diaries.where(weekly_report_id: nil).exists? %>
+                <%= button_to weekly_reports_path, method: :post, class: "btn btn-info fw-bold text-white shadow-sm rounded-pill w-100 py-2 mb-3", data: { disable_with: "AIが分析中..." } do %>
+                  <i class="fas fa-magic me-2"></i> 未分析の日記から新しいレポートを作成 ✨
+                <% end %>
               <% end %>
+
+              <div class="text-end">
+                <%# 削除して作り直すためのボタン %>
+                <%= link_to weekly_report_path(@latest_weekly_report), data: { turbo_method: :delete, turbo_confirm: "現在のレポートを削除して作り直しますか？" }, class: "btn btn-outline-danger btn-sm rounded-pill" do %>
+                  <i class="fas fa-redo me-1"></i> 現在のレポートを作り直す
+                <% end %>
+              </div>
             </div>
           <% else %>
             <%# 💡 レポート作成前の表示 %>
