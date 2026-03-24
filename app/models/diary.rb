@@ -1,12 +1,19 @@
 class Diary < ApplicationRecord
   belongs_to :user
-  
-  # ウィークリーレポートとの紐付き（※オプション指定により、レポートが無くても日記は保存可能）
   belongs_to :weekly_report, optional: true
 
-  # （日記が消えたら、関連するデータも一緒に消す設定） 
   has_many :reviews, dependent: :destroy
   has_many :ai_interviews, dependent: :destroy
+  
+  has_one :review # 日記から生まれるレビューは1つ
 
-  # (その他の既存のコード...)
+  # Ransack用の検索・並び替え許可リスト
+  def self.ransackable_attributes(auth_object = nil)["id", "is_published", "content", "emotion_score", "created_at"]
+  end
+
+  # Ransackで「関連するユーザー(user)」の情報も検索して良いと許可します
+  def self.ransackable_associations(auth_object = nil)
+    ["user"]
+  end
+
 end
