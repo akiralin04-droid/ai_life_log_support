@@ -8,9 +8,10 @@
     </p>
   </div>
   
-  <div class="row g-5 my-5">
-    <%# アピールポイント1：音声入力と無限推敲 %>
-    <div class="col-md-6 d-flex align-items-center">
+  <%# アピールポイント1：音声入力と無限推敲 %>
+  <%# 独立した row（行）に分けることで他の項目の順番に影響を与えなくします %>
+  <div class="row g-5 my-5 align-items-center">
+    <div class="col-md-6">
       <div>
         <div class="mb-3"><i class="fas fa-microphone-alt fa-3x text-danger"></i></div>
         <h3 class="fw-bold">1. マイクに向かって話すだけ</h3>
@@ -26,9 +27,12 @@
         <h5 class="fw-bold text-primary">AI:「その時の感情をもう少し詳しく教えてもらえますか？」</h5>
       </div>
     </div>
+  </div>
 
-    <%# アピールポイント2：インサイトと感情分析 %>
-    <div class="col-md-6 order-md-2 d-flex align-items-center">
+  <%# アピールポイント2：インサイトと感情分析 %>
+  <%# 大画面の時だけ order-md-1 と order-md-2 で左右を入れ替えてお洒落なジグザグにします %>
+  <div class="row g-5 my-5 align-items-center">
+    <div class="col-md-6 order-md-2">
       <div>
         <div class="mb-3"><i class="fas fa-brain fa-3x text-info"></i></div>
         <h3 class="fw-bold">2. AIがあなたの心を分析</h3>
@@ -45,9 +49,11 @@
         <p class="small text-danger mt-2">ギャップ: +1.5 (無意識のポジティブな感情を検知！)</p>
       </div>
     </div>
+  </div>
 
-    <%# アピールポイント3：企業のキャンペーン連携 %>
-    <div class="col-md-6 d-flex align-items-center">
+  <%# アピールポイント3：企業のキャンペーン連携 %>
+  <div class="row g-5 my-5 align-items-center">
+    <div class="col-md-6">
       <div>
         <div class="mb-3"><i class="fas fa-bullhorn fa-3x text-warning"></i></div>
         <h3 class="fw-bold">3. 日常の記録が価値に変わる</h3>
