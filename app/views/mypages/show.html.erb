@@ -146,26 +146,34 @@
                             </span>
                           </div>
 
-                          <%# 日記があればドロップダウンを表示 %>
-                          <div class="mt-auto mb-1 text-center dropdown">
+                          <%# 日記があればリンクまたはドロップダウンを表示 %>
+                          <div class="mt-auto mb-1 text-center">
                             <% if has_diary %>
-                              <button class="btn <%= btn_color_class %> btn-sm rounded-pill shadow-sm p-0 px-2 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.75rem;">
-                                <i class="fas <%= is_all_analyzed ? 'fa-check-circle' : 'fa-pen' %> fa-xs"></i> <%= count %>件
-                              </button>
-                              
-                              <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="min-width: 200px; font-size: 0.85rem;">
-                                <li><h6 class="dropdown-header text-dark fw-bold"><%= date.strftime('%-m月%-d日') %> の記録</h6></li>
-                                <% day_diaries.each do |diary| %>
-                                  <li>
-                                    <% preview_text = diary.schedule.presence || diary.content.presence || "記録あり" %>
-                                    <%# 💡 分析済みなら水色のチェック、未分析なら緑のペンアイコンを表示 %>
-                                    <% status_icon = diary.weekly_report_id.present? ? '<i class="fas fa-check-circle text-info me-1" title="分析済み"></i>' : '<i class="fas fa-pen text-success me-1" title="未分析"></i>' %>
-                                    <%= link_to diary_path(diary), data: { turbo_frame: "_top" }, class: "dropdown-item py-2 border-bottom text-wrap" do %>
-                                      <%= status_icon.html_safe %> <%= truncate(preview_text, length: 15) %>
-                                    <% end %>
-                                  </li>
+                              <% if count == 1 %>
+                                <%# 💡 1件ならワンクリックで直接詳細画面に飛ぶ最強リンクにする %>
+                                <%= link_to diary_path(day_diaries.first), data: { turbo_frame: "_top" }, class: "btn #{btn_color_class} btn-sm rounded-pill shadow-sm p-0 px-2 text-decoration-none text-white", style: "font-size: 0.75rem;" do %>
+                                  <i class="fas <%= is_all_analyzed ? 'fa-check-circle' : 'fa-pen' %> fa-xs"></i> 1件
                                 <% end %>
-                              </ul>
+                              <% else %>
+                                <%# 💡 2件以上ならドロップダウン（従来通り） %>
+                                <div class="dropdown">
+                                  <button class="btn <%= btn_color_class %> btn-sm rounded-pill shadow-sm p-0 px-2 dropdown-toggle text-white" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.75rem;">
+                                    <i class="fas <%= is_all_analyzed ? 'fa-check-circle' : 'fa-pen' %> fa-xs"></i> <%= count %>件
+                                  </button>
+                                  <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="min-width: 200px; font-size: 0.85rem;">
+                                    <li><h6 class="dropdown-header text-dark fw-bold"><%= date.strftime('%-m月%-d日') %> の記録</h6></li>
+                                    <% day_diaries.each do |diary| %>
+                                      <li>
+                                        <% preview_text = diary.schedule.presence || diary.content.presence || "記録あり" %>
+                                        <% status_icon = diary.weekly_report_id.present? ? '<i class="fas fa-check-circle text-info me-1" title="分析済み"></i>' : '<i class="fas fa-pen text-success me-1" title="未分析"></i>' %>
+                                        <%= link_to diary_path(diary), data: { turbo_frame: "_top" }, class: "dropdown-item py-2 border-bottom text-wrap" do %>
+                                          <%= status_icon.html_safe %> <%= truncate(preview_text, length: 15) %>
+                                        <% end %>
+                                      </li>
+                                    <% end %>
+                                  </ul>
+                                </div>
+                              <% end %>
                             <% end %>
                           </div>
                           
