@@ -26,5 +26,11 @@ module AiLifeLogSupport
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    # ▼▼▼ 追加: デフォルトの言語を日本語(:ja)に設定 ▼▼▼
+    config.i18n.default_locale = :ja
+    
+    # 複数の言語ファイルを読み込めるようにする設定（今後ファイルが増えても安心）
+    config.i18n.load_path += Dir[Rails.root.join('config', 'locales', '**', '*.{rb,yml}').to_s]
   end
 end
