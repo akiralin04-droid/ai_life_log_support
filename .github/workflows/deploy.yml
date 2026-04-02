@@ -19,6 +19,8 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           # ▼▼▼ ロボットがサーバーに入ってから自動で叩くコマンド ▼▼▼
           script: |
+            export PATH="$HOME/.rbenv/bin:$PATH"
+            eval "$(rbenv init -)"
             cd ~/ai_life_log_support
             git pull origin main
             bundle config set --local without 'development test'
