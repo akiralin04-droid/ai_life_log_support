@@ -1,0 +1,33 @@
+ja:
+  activerecord:
+    models:
+      user: "ユーザー"
+      diary: "日記"
+      review: "レビュー"
+      campaign: "キャンペーン"
+      ai_interview: "AIインタビュー"
+      weekly_report: "分析レポート"
+    
+    # ここで「データベースのカラム名（英語）」と「画面に出す日本語」を紐付けます！
+    attributes:
+      user:
+        name: "ニックネーム"
+        email_address: "メールアドレス"
+        password: "パスワード"
+        password_confirmation: "パスワード（確認用）"
+        introduction: "自己紹介"
+        profile_image: "プロフィール画像"
+      diary:
+        schedule: "今日の予定"
+        content: "日記本文"
+        raw_voice_text: "音声データ"
+      review:
+        title: "タイトル"
+        body: "レビュー本文"
+        rating: "評価"
+        category: "カテゴリー"
+
+  # カスタムエラーメッセージ（必要に応じて独自のエラー文を作れます）
+  errors:
+    messages:
+      record_invalid: "入力内容にエラーがあります。"
