@@ -1,0 +1,28 @@
+name: Deploy to EC2 (本番環境への自動デプロイ)
+
+# このロボットが動く条件：「main」ブランチにコードがPush（またはMerge）された時
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest # ロボットの動くOS環境
+
+    steps:
+      - name: EC2へSSH接続してデプロイコマンドを実行
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          # ▼▼▼ ロボットがサーバーに入ってから自動で叩くコマンド ▼▼▼
+          script: |
+            cd ~/ai_life_log_support
+            git pull origin main
+            bundle config set --local without 'development test'
+            bundle install
+            RAILS_ENV=production bin/rails db:migrate
+            RAILS_ENV=production bin/rails assets:precompile
+            sudo systemctl restart puma
